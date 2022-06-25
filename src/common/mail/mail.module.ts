@@ -4,6 +4,6 @@ import { MailController } from './mail.controller';
 
 @Module({
   controllers: [MailController],
-  providers: [MailService]
+  providers: [MailService],
 })
 export class MailModule {}
