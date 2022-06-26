@@ -7,9 +7,9 @@
 | The configuration files are used to set the application configuration.
 */
 
-import confif___app from '@tadashi-config/app.config';
-import config___file from '@tadashi-config/file.config';
-import config___mail from '@tadashi-config/mail.config';
+import confif___app from './app.config';
+import config___file from './file.config';
+import config___mail from './mail.config';
 
 /**
  * Register the configuration services.

@@ -1,26 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectModel } from 'nestjs-typegoose';
+import { ReturnModelType } from '@typegoose/typegoose';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
+  constructor(
+    @InjectModel(User)
+    private readonly model: ReturnModelType<typeof User>,
+  ) {}
 
-  findAll() {
-    return `This action returns all user`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  /**
+   *  Create a new user
+   * @param data CreateUserDto
+   * @returns Promise<User>
+   */
+  create(data: User): Promise<User> {
+    return this.model.create(data);
   }
 }

@@ -3,6 +3,8 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as cowsay from 'cowsay';
 import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
+import validationOptions from '@/app/utils/validation-options';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   const config = app.get(ConfigService);
@@ -20,6 +22,11 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup(config.get('app.doc'), app, document);
+
+  /**
+   * Validation Pipe for formating validation error
+   */
+  app.useGlobalPipes(new ValidationPipe(validationOptions));
 
   /**
    * boot the app porting the config.port

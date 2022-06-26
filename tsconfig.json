@@ -11,9 +11,7 @@
     "outDir": "./dist",
     "baseUrl": "./src",
     "paths": {
-      "@tadashi-config/*": ["app/config/*"],
-      "@tadashi-api/*": ["api/*"],
-      "@tadashi-utils/*": ["api/utils/*"]
+      "@/*": ["*"]
     },
     "incremental": true,
     "skipLibCheck": true,
