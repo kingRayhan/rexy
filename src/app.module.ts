@@ -6,16 +6,15 @@ import { RoleModule } from './api/role/role.module';
 import { SessionModule } from './api/session/session.module';
 import { MailModule } from './common/mail/mail.module';
 import { NotificationModule } from './common/notification/notification.module';
-import appConfig from './app/config/app.config';
-import mailConfig from './app/config/mail.config';
-import fileConfig from './app/config/file.config';
+import configs from '@tadashi-config/index';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './api/auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, mailConfig, fileConfig],
+      load: configs,
       envFilePath: ['.env.prod', '.env.dev', '.env'],
     }),
     UserModule,
@@ -23,6 +22,7 @@ import { ConfigModule } from '@nestjs/config';
     SessionModule,
     MailModule,
     NotificationModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

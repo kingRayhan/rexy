@@ -14,7 +14,7 @@ export default registerAs('app', () => ({
     | any other location as required by the application or its packages.
     |
     */
-  name: process.env.APP_NAME || 'nestjs-boilerplate',
+  name: process.env.APP_NAME || 'tadashi-api',
   /*
     |--------------------------------------------------------------------------
     | Application Description
