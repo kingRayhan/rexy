@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { User } from './entities/user.entity';
+import { FilterQuery } from 'mongoose';
 
 @Injectable()
 export class UserService {
@@ -15,7 +16,7 @@ export class UserService {
    * @param user User
    * @returns Promise<User>
    */
-  create(user: User): Promise<User> {
+  create(user: User) {
     return this.model.create(user);
   }
 
@@ -30,13 +31,12 @@ export class UserService {
   }
 
   /**
-   * Find a user by id
-   * @param id User id
+   * Fetch a user
+   * @param identifier FilterQuery<User>
    * @returns Promise<User>
-   * @throws {Error} If user not found
    */
-  findById(id: string) {
-    return this.model.findById(id);
+  getUser(identifier: FilterQuery<User>): Promise<User> {
+    return this.model.findOne(identifier).exec();
   }
 
   /**
@@ -53,6 +53,6 @@ export class UserService {
    * @returns Promise<User[]>
    */
   deleteAll() {
-    return this.model.deleteMany({});
+    return this.model.deleteMany();
   }
 }

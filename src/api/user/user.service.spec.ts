@@ -34,5 +34,17 @@ describe('UserService', () => {
     expect(user).toMatchObject(userData);
   });
 
-  // it('userService.findAll -> Get all users', async () => {});
+  it('userService.getUser -> Get a single user using _id', async () => {
+    const userData = {
+      name: 'John Doe',
+      username: 'johndoe',
+      email: 'john@gmail.com',
+      password: '123456',
+    };
+    const savedUser = await service.create(userData);
+
+    service.getUser({ _id: savedUser.id }).then((user) => {
+      expect(user).toMatchObject(userData);
+    });
+  });
 });
