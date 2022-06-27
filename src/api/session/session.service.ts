@@ -18,7 +18,7 @@ export class SessionService {
     //   { subscriber },
     //   this.config.getOrThrow('auth.at_secret'),
     // );
-    return this.config.getOrThrow('auth.at_secret');
+    return this.config.get('auth.at_secret');
     // return { accessToken };
   }
 }
