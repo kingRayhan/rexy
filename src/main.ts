@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import 'module-alias/register';
 import * as cowsay from 'cowsay';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';

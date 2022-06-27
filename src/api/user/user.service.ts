@@ -12,10 +12,47 @@ export class UserService {
 
   /**
    *  Create a new user
-   * @param data CreateUserDto
+   * @param user User
    * @returns Promise<User>
    */
-  create(data: User): Promise<User> {
-    return this.model.create(data);
+  create(user: User): Promise<User> {
+    return this.model.create(user);
+  }
+
+  /**
+   * Update a user
+   * @param id User id
+   * @param data  UpdateUserDto
+   * @returns Promise<User>
+   */
+  update(id: string, data: User) {
+    return this.model.findOneAndUpdate({ _id: id }, data, { new: true });
+  }
+
+  /**
+   * Find a user by id
+   * @param id User id
+   * @returns Promise<User>
+   * @throws {Error} If user not found
+   */
+  findById(id: string) {
+    return this.model.findById(id);
+  }
+
+  /**
+   * Delete a user
+   * @param id User id
+   * @returns  Promise<User>
+   */
+  delete(id: string) {
+    return this.model.findByIdAndDelete(id);
+  }
+
+  /**
+   * Delete all users
+   * @returns Promise<User[]>
+   */
+  deleteAll() {
+    return this.model.deleteMany({});
   }
 }

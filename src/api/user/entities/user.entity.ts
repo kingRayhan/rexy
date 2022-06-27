@@ -21,7 +21,7 @@ export class User {
   @prop()
   public password: string;
 
-  get avatar(): string {
-    return 'https://www.gravatar.com/avatar/' + md5(this.email);
-  }
+  // get avatar(): string {
+  //   return 'https://www.gravatar.com/avatar/' + md5(this.email);
+  // }
 }
