@@ -1,26 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSessionDto } from './dto/create-session.dto';
-import { UpdateSessionDto } from './dto/update-session.dto';
+import { ReturnModelType } from '@typegoose/typegoose';
+import { InjectModel } from 'nestjs-typegoose';
+import { sign as jwtSign } from 'jsonwebtoken';
+import { Session } from './entities/session.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SessionService {
-  create(createSessionDto: CreateSessionDto) {
-    return 'This action adds a new session';
-  }
+  constructor(
+    @InjectModel(Session)
+    private readonly model: ReturnModelType<typeof Session>,
+    private readonly config: ConfigService,
+  ) {}
 
-  findAll() {
-    return `This action returns all session`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} session`;
-  }
-
-  update(id: number, updateSessionDto: UpdateSessionDto) {
-    return `This action updates a #${id} session`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} session`;
+  generateAccessAndRefreshTokens(subscriber: string) {
+    // const accessToken = jwtSign(
+    //   { subscriber },
+    //   this.config.getOrThrow('auth.at_secret'),
+    // );
+    return this.config.getOrThrow('auth.at_secret');
+    // return { accessToken };
   }
 }
