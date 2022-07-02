@@ -13,4 +13,7 @@ export class Session {
 
   @prop({ required: true, ref: () => User })
   subscriber: User;
+
+  @prop({ required: true })
+  rt_secret: string;
 }

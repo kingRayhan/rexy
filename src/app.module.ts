@@ -8,7 +8,7 @@ import { MailModule } from '@/shared/mail/mail.module';
 import { NotificationModule } from '@/shared/notification/notification.module';
 import { TypegooseModule } from 'nestjs-typegoose';
 import configs from '@/app/config';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from '@/api/auth/auth.module';
 import { TestDatabaseModule } from './shared/test-database/test-database.module';
 
@@ -19,9 +19,13 @@ import { TestDatabaseModule } from './shared/test-database/test-database.module'
       load: configs,
       envFilePath: ['.env.prod', '.env.dev', '.env'],
     }),
-    TypegooseModule.forRoot(
-      'mongodb+srv://rayhan:rayhan123@cluster0.dymuq.mongodb.net/tadashi?retryWrites=true&w=majority',
-    ),
+    TypegooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => ({
+        uri: config.get('database.url'),
+      }),
+    }),
     UserModule,
     RoleModule,
     SessionModule,
