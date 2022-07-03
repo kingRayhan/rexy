@@ -7,8 +7,7 @@ import { TypegooseModule } from 'nestjs-typegoose';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => ({
-        // uri: config.get('database.test_url'),
-        uri: `mongodb+srv://rayhan:rayhan123@cluster0.dymuq.mongodb.net/rexy-test?retryWrites=true&w=majority`,
+        uri: config.get('database.url'),
       }),
     }),
   ],
