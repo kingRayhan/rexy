@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
+import { PartialType } from '@nestjs/mapped-types';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { User } from './entities/user.entity';
 import { FilterQuery } from 'mongoose';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -16,18 +19,18 @@ export class UserService {
    * @param user User
    * @returns Promise<User>
    */
-  create(user: User) {
+  create(user: CreateUserDto) {
     return this.model.create(user);
   }
 
   /**
    * Update a user
-   * @param id User id
+   * @param identifier FilterQuery<User>
    * @param data  UpdateUserDto
    * @returns Promise<User>
    */
-  update(id: string, data: User) {
-    return this.model.findOneAndUpdate({ _id: id }, data, { new: true });
+  update(identifier: FilterQuery<User>, data: UpdateUserDto) {
+    return this.model.findOneAndUpdate(identifier, data, { new: true });
   }
 
   /**
@@ -46,12 +49,5 @@ export class UserService {
    */
   delete(identifier: FilterQuery<User>) {
     return this.model.deleteOne(identifier);
-  }
-
-  /**
-   * Delete all users
-   */
-  deleteAll() {
-    return this.model.deleteMany();
   }
 }

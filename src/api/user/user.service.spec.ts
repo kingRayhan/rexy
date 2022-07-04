@@ -1,23 +1,35 @@
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TypegooseModule } from 'nestjs-typegoose';
+import { TypegooseModule, getModelToken } from 'nestjs-typegoose';
 import { TestDatabaseModule } from '../../shared/test-database/test-database.module';
 import { User } from './entities/user.entity';
+import configs from '../../app/config';
 import { UserService } from './user.service';
+import { ReturnModelType } from '@typegoose/typegoose';
 
 describe('UserService', () => {
   let service: UserService;
+  let model: ReturnModelType<typeof User>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [TestDatabaseModule, TypegooseModule.forFeature([User])],
+      imports: [
+        ConfigModule.forRoot({
+          load: configs,
+        }),
+        TestDatabaseModule,
+        TypegooseModule.forFeature([User]),
+      ],
       providers: [UserService],
     }).compile();
 
     service = module.get<UserService>(UserService);
-  });
+    model = module.get<ReturnModelType<typeof User>>(getModelToken('User'));
 
-  afterAll(async () => {
-    await service.deleteAll();
+    await model.deleteMany();
+  });
+  afterEach(async () => {
+    await model.deleteMany();
   });
 
   it('should be defined', () => {
@@ -64,34 +76,71 @@ describe('UserService', () => {
     });
   });
 
-  // it('userService.delete -> delete a user using username', async () => {
-  //   const users = [
-  //     {
-  //       name: 'Nibbi',
-  //       username: 'nibbi',
-  //       email: 'nibbi@gmail.com',
-  //       password: '123456',
-  //     },
-  //     {
-  //       name: 'toxic',
-  //       username: 'toxic',
-  //       email: 'toxic@toxic.com',
-  //       password: '123456',
-  //     },
-  //     {
-  //       name: 'orchie',
-  //       username: 'orchie',
-  //       email: 'orchie@orchie.com',
-  //       password: '123456',
-  //     },
-  //     {
-  //       name: 'nishu',
-  //       username: 'nishu',
-  //       email: 'nishu@nishu.com',
-  //       password: '123456',
-  //     },
-  //   ];
+  it('userService.getUser -> fetch a user using username and email', async () => {
+    const users = [
+      {
+        name: 'Nibbi',
+        username: 'nibbi',
+        email: 'nibbi@gmail.com',
+        password: '123456',
+      },
+      {
+        name: 'toxic',
+        username: 'toxic',
+        email: 'toxic@toxic.com',
+        password: '123456',
+      },
+      {
+        name: 'orchie',
+        username: 'orchie',
+        email: 'orchie@orchie.com',
+        password: '123456',
+      },
+      {
+        name: 'nishu',
+        username: 'nishu',
+        email: 'nishu@nishu.com',
+        password: '123456',
+      },
+    ];
 
-  //   model.insertMany(users);
-  // });
+    await model.insertMany(users);
+
+    service.getUser({ username: users[0].username }).then((user) => {
+      expect(user).toMatchObject(users[0]);
+    });
+
+    service.getUser({ email: users[1].email }).then((user) => {
+      expect(user).toMatchObject(users[1]);
+    });
+  });
+
+  it('userService.update -> update a user using username and email', async () => {
+    const userData = {
+      name: 'John doe',
+      username: 'johndoe',
+      email: 'johndoe@gmail.com',
+      password: '123456',
+    };
+    const savedUser = await service.create(userData);
+
+    const updatedUser = {
+      name: 'John Doe 2',
+      username: 'johndoe2',
+    };
+
+    // Update user using email
+    service.update({ email: savedUser.email }, updatedUser).then((user) => {
+      // console.log({ user });
+      expect(user.name).toBe(updatedUser.name);
+      expect(user.username).toBe(updatedUser.username);
+    });
+
+    // Update user using username
+    service.update({ username: 'johndoe2' }, updatedUser).then((user) => {
+      // console.log({ user });
+      expect(user.name).toBe(updatedUser.name);
+      expect(user.username).toBe(updatedUser.username);
+    });
+  });
 });

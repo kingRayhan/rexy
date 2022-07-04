@@ -30,6 +30,9 @@ describe('SessionService', () => {
 
     await model.deleteMany();
   });
+  afterAll(async () => {
+    await model.deleteMany();
+  });
 
   it('should be defined', async () => {
     expect(service).toBeDefined();
