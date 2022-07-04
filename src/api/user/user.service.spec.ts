@@ -49,8 +49,8 @@ describe('UserService', () => {
 
   it('userService.getUser -> Get a single user using _id', async () => {
     const userData = {
-      name: 'John Doe' + Date.now(),
-      username: 'johndoe' + Date.now(),
+      name: 'John Doe',
+      username: 'johndoe',
       email: 'john@gmail.com',
       password: '123456',
     };
@@ -58,21 +58,6 @@ describe('UserService', () => {
 
     service.getUser({ _id: savedUser.id }).then((user) => {
       expect(user).toMatchObject(userData);
-    });
-  });
-
-  it('userService.delete -> delete a user using username', async () => {
-    const userData = {
-      name: 'John Doe' + Date.now(),
-      username: 'johndoe' + Date.now(),
-      email: 'john@gmail.com' + Date.now(),
-      password: '123456',
-    };
-    const savedUser = await service.create(userData);
-
-    service.delete({ email: savedUser.email }).then((deleted) => {
-      expect(deleted.deletedCount).toBe(1);
-      expect(deleted.acknowledged).toBe(true);
     });
   });
 
@@ -112,6 +97,20 @@ describe('UserService', () => {
 
     service.getUser({ email: users[1].email }).then((user) => {
       expect(user).toMatchObject(users[1]);
+    });
+  });
+
+  it('userService.delete -> delete a user using username', async () => {
+    const userData = {
+      name: 'John Doe',
+      username: 'johndoe',
+      email: 'john@gmail.com',
+      password: '123456',
+    };
+    const savedUser = await service.create(userData);
+
+    service.delete({ email: savedUser.email }).then((deleted) => {
+      expect(deleted.acknowledged).toBe(true);
     });
   });
 

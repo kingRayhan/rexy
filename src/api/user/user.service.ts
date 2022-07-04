@@ -44,10 +44,18 @@ export class UserService {
 
   /**
    * Delete a user
-   * @param id User id
+   * @param identifier FilterQuery<User>
    * @returns  Promise<User>
    */
   delete(identifier: FilterQuery<User>) {
     return this.model.deleteOne(identifier);
+  }
+
+  /**
+   * Delete all users
+   * @returns
+   */
+  deleteAll() {
+    return this.model.deleteMany({});
   }
 }
