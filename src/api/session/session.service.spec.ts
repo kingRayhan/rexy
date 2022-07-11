@@ -1,11 +1,11 @@
-import { TestDatabaseModule } from './../../shared/test-database/test-database.module';
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ReturnModelType } from '@typegoose/typegoose';
 import { getModelToken, TypegooseModule } from 'nestjs-typegoose';
+import configs from '../../app/config';
+import { TestDatabaseModule } from './../../shared/test-database/test-database.module';
 import { Session } from './entities/session.entity';
 import { SessionService } from './session.service';
-import configs from '../../app/config';
-import { ConfigModule } from '@nestjs/config';
-import { ReturnModelType } from '@typegoose/typegoose';
 
 describe('SessionService', () => {
   let service: SessionService;
@@ -34,11 +34,11 @@ describe('SessionService', () => {
     await model.deleteMany();
   });
 
-  it('should be defined', async () => {
+  it('session service should be defined', async () => {
     expect(service).toBeDefined();
   });
 
-  it('sessionService.generateAccessAndRefreshTokens -> generate access and refresh token', async () => {
+  it('sessionService.storeSessionToDatabase -> Generate access & refresh token for a userId', async () => {
     const { accessToken, refreshToken } =
       service.generateAccessAndRefreshTokens(
         '62a9b253fc13ae4f6b000015',
@@ -48,7 +48,7 @@ describe('SessionService', () => {
     expect(refreshToken).toBeDefined();
   });
 
-  it('sessionService.createSession -> create session', async () => {
+  it('sessionService.createSession -> Store session to database', async () => {
     const subscriber = '62a9b253fc13ae4f6b000015';
     const session = await service.storeSessionToDatabase(
       subscriber,
@@ -59,10 +59,12 @@ describe('SessionService', () => {
     expect(session.subscriber.toString()).toBe(subscriber);
   });
 
-  // it('sessionService.generateRefreshTokenSecret -> generate a new refresh token secret for a given user id', async () => {
-  //   const secret = service.generateRefreshTokenSecret(
-  //     '62a9b253fc13ae4f6b000015',
-  //   );
-  //   expect(secret).toBeDefined();
-  // });
+  it('sessionService.claimToken -> Claim token for a userId', async () => {
+    service
+      .claimToken('62a9b253fc13ae4f6b000015')
+      .then(({ accessToken, refreshToken }) => {
+        expect(accessToken).toBeDefined();
+        expect(refreshToken).toBeDefined();
+      });
+  });
 });

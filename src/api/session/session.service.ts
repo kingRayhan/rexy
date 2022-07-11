@@ -10,14 +10,10 @@ import { Session } from './entities/session.entity';
 export class SessionService {
   constructor(
     @InjectModel(Session)
-    private readonly model: ReturnModelType<typeof Session>,
-    private readonly userService: UserService, // private readonly config: ConfigService,
+    private readonly model: ReturnModelType<typeof Session>, // private readonly config: ConfigService,
   ) {}
 
   async claimToken(subscriber: string) {
-    const _user = await this.userService.getUserById(subscriber);
-    // if (!Boolean(_user)) throw new ForbiddenException('Invalid subscriber id');
-    console.log({ subscriber, _user });
     // Refresh token secret for this specific claim
     const rt_secret = this.generateRefreshTokenSecret(subscriber);
 
