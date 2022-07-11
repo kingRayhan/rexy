@@ -1,19 +1,19 @@
 import { HttpStatus } from '@nestjs/common';
 
-interface IResponseConstructor {
-  status: HttpStatus;
+export interface IResponseConstructor {
+  statusCode: HttpStatus;
   message?: string;
   data?: any;
 }
 
 export default class AppResponse {
-  public status: HttpStatus;
+  public statusCode: HttpStatus;
   public message?: string;
   public data?: any;
 
-  constructor({ data, status, message = undefined }: IResponseConstructor) {
+  constructor({ data, statusCode, message = undefined }: IResponseConstructor) {
     this.message = message;
-    this.status = status;
+    this.statusCode = statusCode;
     this.data = data;
   }
 }

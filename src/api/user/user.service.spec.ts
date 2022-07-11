@@ -1,12 +1,11 @@
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TypegooseModule, getModelToken } from 'nestjs-typegoose';
+import { ReturnModelType } from '@typegoose/typegoose';
+import { getModelToken, TypegooseModule } from 'nestjs-typegoose';
+import configs from '../../app/config';
 import { TestDatabaseModule } from '../../shared/test-database/test-database.module';
 import { User } from './entities/user.entity';
-import configs from '../../app/config';
 import { UserService } from './user.service';
-import { ReturnModelType } from '@typegoose/typegoose';
-import clearDB from '../../app/utils/clearDB';
 
 describe('UserService', () => {
   let service: UserService;

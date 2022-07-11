@@ -1,5 +1,5 @@
-import AppResponse from '@/app/utils/app-response.class';
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import AppResponse from '../../app/utils/app-response.class';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthLoginDTO } from './dto/login.dto';
@@ -16,8 +16,14 @@ export class AuthController {
     return data;
   }
 
-  @Post()
-  login(@Body() payload: AuthLoginDTO) {
-    return this.authService.login(payload);
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() payload: AuthLoginDTO) {
+    const data = await this.authService.login(payload);
+    return new AppResponse({
+      statusCode: HttpStatus.OK,
+      message: 'Login successful',
+      data,
+    });
   }
 }
