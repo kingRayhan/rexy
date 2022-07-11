@@ -34,15 +34,21 @@ describe('AuthService', () => {
     await userModel.deleteMany({});
   });
 
-  beforeEach(async () => {
-    await userModel.deleteMany({});
-  });
+  // ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+  // I wish to delete users collection before each test
+  // but it's not working as expected. Most likely I am doing something wrong.
+  // Send PR if you know how to fix it.
+  // beforeEach(async () => {
+  //   await userModel.deleteMany({});
+  // });
+  // ☢️ For now: delete all users before each test menually 👺
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
   it('authService.register -> Register a new user', async () => {
+    await userModel.deleteMany({});
     const payload: AuthRegisterDTO = {
       email: 'john@gmail.com',
       password: '123456',
@@ -56,9 +62,11 @@ describe('AuthService', () => {
       expect(user.username).toBe(payload.username);
       expect(user.password).not.toBe(payload.password);
     });
+    await userModel.deleteMany({});
   });
 
   it('authService.register -> throw 403 if username exists', async () => {
+    await userModel.deleteMany({});
     const payload: AuthRegisterDTO = {
       name: 'John Doe1',
       username: 'johndoe1',
@@ -72,9 +80,11 @@ describe('AuthService', () => {
       expect(err.status).toBe(403);
       expect(err.message).toBe('Username already exists');
     });
+    await userModel.deleteMany({});
   });
 
   it('authService.register -> throw 403 if email exists', async () => {
+    await userModel.deleteMany({});
     const payload: AuthRegisterDTO = {
       name: 'John Doed',
       username: 'johndoe1',
@@ -88,9 +98,11 @@ describe('AuthService', () => {
       expect(err.status).toBe(403);
       expect(err.message).toBe('Email already exists');
     });
+    await userModel.deleteMany({});
   });
 
   it('authService.login -> Get access and refresh token using username and password', async () => {
+    await userModel.deleteMany({});
     const payload: AuthRegisterDTO = {
       email: 'john@gmail.com',
       password: '123456',
@@ -109,9 +121,11 @@ describe('AuthService', () => {
         expect(res.accessToken).toBeDefined();
         expect(res.refreshToken).toBeDefined();
       });
+    await userModel.deleteMany({});
   });
 
   it('authService.login -> get 403 for invalid username', async () => {
+    await userModel.deleteMany({});
     const payload: AuthRegisterDTO = {
       email: 'john@gmail.com',
       password: '123456',
@@ -129,9 +143,11 @@ describe('AuthService', () => {
         expect(err.status).toBe(403);
         expect(err.message).toBe('Invalid credential');
       });
+    await userModel.deleteMany({});
   });
 
   it('authService.login -> get 403 for invalid password', async () => {
+    await userModel.deleteMany({});
     const payload: AuthRegisterDTO = {
       email: 'john@gmail.com',
       password: '123456',
@@ -148,5 +164,6 @@ describe('AuthService', () => {
         expect(err.status).toBe(403);
         expect(err.message).toBe('Invalid credential');
       });
+    await userModel.deleteMany({});
   });
 });

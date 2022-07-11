@@ -14,10 +14,6 @@ export class AuthController {
   register(@Body() payload: AuthRegisterDTO) {
     const data = this.authService.register(payload);
     return data;
-    // return new AppResponse({
-    //   data,
-    //   status: HttpStatus.OK,
-    // });
   }
 
   @Post()

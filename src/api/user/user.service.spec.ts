@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import configs from '../../app/config';
 import { UserService } from './user.service';
 import { ReturnModelType } from '@typegoose/typegoose';
+import clearDB from '../../app/utils/clearDB';
 
 describe('UserService', () => {
   let service: UserService;
@@ -40,8 +41,11 @@ describe('UserService', () => {
   // });
   // ☢️ For now: delete all users before each test menually 👺
 
-  it('userService.create -> Create a new user', async () => {
+  beforeEach(async () => {
     await model.deleteMany({});
+  });
+
+  it('userService.create -> Create a new user', async () => {
     const userData = {
       name: 'John Doe',
       username: 'johndoe',
@@ -54,11 +58,9 @@ describe('UserService', () => {
       expect(user.email).toBe(userData.email);
       expect(user.password).not.toBe(userData.password); // 🤖: because password is hashed
     });
-    await model.deleteMany({});
   });
 
   it('userService.getUser -> fetch a user using username and email', async () => {
-    await model.deleteMany({});
     const users = [
       {
         name: 'Nibbi',
@@ -122,7 +124,6 @@ describe('UserService', () => {
   });
 
   it('userService.update -> update a user using username', async () => {
-    await model.deleteMany({});
     const userData = {
       name: 'John Doe',
       username: 'johndoe',
@@ -143,7 +144,6 @@ describe('UserService', () => {
   });
 
   it('userService.comparePassword -> Compare user password', async () => {
-    await model.deleteMany({});
     const user = await model.create({
       name: 'John Doe',
       username: 'johndoe',
