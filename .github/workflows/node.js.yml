@@ -30,4 +30,12 @@ jobs:
         
     - name: Install dependencies
       run: npm install --force
-    - run: npm test
+      
+    - name: Start MongoDB
+      uses: supercharge/mongodb-github-action@1.7.0
+      with:
+        mongodb-version: ${{ matrix.mongodb-version }}
+        mongodb-db: text-test
+
+    - name: Start testing
+      run: npm run test
