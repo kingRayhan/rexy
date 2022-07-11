@@ -13,6 +13,11 @@ export class SessionService {
     private readonly model: ReturnModelType<typeof Session>, // private readonly config: ConfigService,
   ) {}
 
+  /**
+   * Claim token for a user id
+   * @param subscriber user_id string - user id
+   * @returns
+   */
   async claimToken(subscriber: string) {
     // Refresh token secret for this specific claim
     const rt_secret = this.generateRefreshTokenSecret(subscriber);

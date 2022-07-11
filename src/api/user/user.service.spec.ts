@@ -11,7 +11,7 @@ describe('UserService', () => {
   let service: UserService;
   let model: ReturnModelType<typeof User>;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
@@ -25,43 +25,40 @@ describe('UserService', () => {
 
     service = module.get<UserService>(UserService);
     model = module.get<ReturnModelType<typeof User>>(getModelToken('User'));
-
-    await model.deleteMany();
-  });
-  afterEach(async () => {
-    await model.deleteMany();
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
+  // ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+  // I wish to delete users collection before each test
+  // but it's not working as expected. Most likely I am doing something wrong.
+  // Send PR if you know how to fix it.
+  // beforeEach(async () => {
+  //   // await model.deleteMany({});
+  // });
+  // ☢️ For now: delete all users before each test menually 👺
+
   it('userService.create -> Create a new user', async () => {
+    await model.deleteMany({});
     const userData = {
       name: 'John Doe',
       username: 'johndoe',
       email: 'john@gmail.com',
       password: '123456',
     };
-    const user = await service.create(userData);
-    expect(user).toMatchObject(userData);
-  });
-
-  it('userService.getUser -> Get a single user using username', async () => {
-    const userData = {
-      name: 'John Doe',
-      username: 'johndoe',
-      email: 'john@gmail.com',
-      password: '123456',
-    };
-    await model.create(userData);
-
-    service.getUser({ username: userData.username }).then((user) => {
-      expect(user).toMatchObject(userData);
+    service.create(userData).then((user) => {
+      expect(user.name).toBe(userData.name);
+      expect(user.username).toBe(userData.username);
+      expect(user.email).toBe(userData.email);
+      expect(user.password).not.toBe(userData.password); // 🤖: because password is hashed
     });
+    await model.deleteMany({});
   });
 
   it('userService.getUser -> fetch a user using username and email', async () => {
+    await model.deleteMany({});
     const users = [
       {
         name: 'Nibbi',
@@ -73,6 +70,12 @@ describe('UserService', () => {
         name: 'toxic',
         username: 'toxic',
         email: 'toxic@toxic.com',
+        password: '123456',
+      },
+      {
+        name: 'adhu',
+        username: 'adhunika',
+        email: 'adhunika92@gmail.com',
         password: '123456',
       },
       {
@@ -92,29 +95,34 @@ describe('UserService', () => {
     await model.insertMany(users);
 
     service.getUser({ username: users[0].username }).then((user) => {
-      expect(user).toMatchObject(users[0]);
+      expect(user).toBeDefined();
+      expect(user.name).toBe(users[0].name);
+      expect(user.username).toBe(users[0].username);
+      expect(user.email).toBe(users[0].email);
     });
 
     service.getUser({ email: users[1].email }).then((user) => {
-      expect(user).toMatchObject(users[1]);
+      expect(user).toBeDefined();
+      expect(user.name).toBe(users[1].name);
+      expect(user.username).toBe(users[1].username);
+      expect(user.email).toBe(users[1].email);
     });
   });
 
   it('userService.delete -> delete a user using username', async () => {
-    const userData = {
-      name: 'John Doe',
-      username: 'johndoe',
-      email: 'john@gmail.com',
-      password: '123456',
-    };
-    await model.create(userData);
+    service.delete({ username: 'nibbi' }).then((deleted) => {
+      expect(deleted.acknowledged).toBe(true);
+    });
+  });
 
-    service.delete({ email: userData.email }).then((deleted) => {
+  it('userService.delete -> delete a user using email', async () => {
+    service.delete({ email: 'nishu@nishu.com' }).then((deleted) => {
       expect(deleted.acknowledged).toBe(true);
     });
   });
 
   it('userService.update -> update a user using username', async () => {
+    await model.deleteMany({});
     const userData = {
       name: 'John Doe',
       username: 'johndoe',
@@ -122,19 +130,31 @@ describe('UserService', () => {
       password: '123456',
     };
     await model.create(userData);
-
     const updatedUser = {
       name: 'John Doe 2',
       username: 'johndoe2',
     };
+    service
+      .update({ username: userData.username }, updatedUser)
+      .then((user) => {
+        expect(user.name).toBe(updatedUser.name);
+        expect(user.username).toBe(updatedUser.username);
+      });
+  });
 
-    // Update user using email
-    const saved = await service.update(
-      { username: userData.username },
-      updatedUser,
-    );
-    expect(saved).toBeDefined();
-    expect(saved.name).toBe(updatedUser.name);
-    expect(saved.username).toBe(updatedUser.username);
+  it('userService.comparePassword -> Compare user password', async () => {
+    await model.deleteMany({});
+    const user = await model.create({
+      name: 'John Doe',
+      username: 'johndoe',
+      email: 'john@gmail.com',
+      password: 'valid-password',
+    });
+
+    const matchResult1 = service.comparePassword(user, 'valid-password');
+    expect(matchResult1).toBe(true);
+
+    const matchResult2 = service.comparePassword(user, 'wrong-password');
+    expect(matchResult2).toBe(false);
   });
 });
