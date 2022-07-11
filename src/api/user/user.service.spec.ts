@@ -45,6 +45,10 @@ describe('UserService', () => {
     await model.deleteMany({});
   });
 
+  afterAll(async () => {
+    await model.deleteMany({});
+  });
+
   it('userService.create -> Create a new user', async () => {
     const userData = {
       name: 'John Doe',
