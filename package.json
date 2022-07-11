@@ -1,8 +1,12 @@
 {
-  "name": "tadashi",
+  "name": "rexy",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": {
+    "name": "KingRayhan",
+    "email": "rayhan.dev.bd@gmail.com",
+    "url": "https://rayhan.dev"
+  },
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
