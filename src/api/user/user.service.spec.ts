@@ -47,16 +47,16 @@ describe('UserService', () => {
     expect(user).toMatchObject(userData);
   });
 
-  it('userService.getUser -> Get a single user using _id', async () => {
+  it('userService.getUser -> Get a single user using username', async () => {
     const userData = {
       name: 'John Doe',
       username: 'johndoe',
       email: 'john@gmail.com',
       password: '123456',
     };
-    const savedUser = await service.create(userData);
+    await model.create(userData);
 
-    service.getUser({ _id: savedUser.id }).then((user) => {
+    service.getUser({ username: userData.username }).then((user) => {
       expect(user).toMatchObject(userData);
     });
   });
@@ -107,21 +107,21 @@ describe('UserService', () => {
       email: 'john@gmail.com',
       password: '123456',
     };
-    const savedUser = await service.create(userData);
+    await model.create(userData);
 
-    service.delete({ email: savedUser.email }).then((deleted) => {
+    service.delete({ email: userData.email }).then((deleted) => {
       expect(deleted.acknowledged).toBe(true);
     });
   });
 
-  it('userService.update -> update a user using username and email', async () => {
+  it('userService.update -> update a user using username', async () => {
     const userData = {
-      name: 'John doe',
+      name: 'John Doe',
       username: 'johndoe',
-      email: 'johndoe@gmail.com',
+      email: 'john@gmail.com',
       password: '123456',
     };
-    const savedUser = await service.create(userData);
+    await model.create(userData);
 
     const updatedUser = {
       name: 'John Doe 2',
@@ -129,17 +129,12 @@ describe('UserService', () => {
     };
 
     // Update user using email
-    service.update({ email: savedUser.email }, updatedUser).then((user) => {
-      // console.log({ user });
-      expect(user.name).toBe(updatedUser.name);
-      expect(user.username).toBe(updatedUser.username);
-    });
-
-    // Update user using username
-    service.update({ username: 'johndoe2' }, updatedUser).then((user) => {
-      // console.log({ user });
-      expect(user.name).toBe(updatedUser.name);
-      expect(user.username).toBe(updatedUser.username);
-    });
+    const saved = await service.update(
+      { username: userData.username },
+      updatedUser,
+    );
+    expect(saved).toBeDefined();
+    expect(saved.name).toBe(updatedUser.name);
+    expect(saved.username).toBe(updatedUser.username);
   });
 });

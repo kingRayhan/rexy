@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
-import { PartialType } from '@nestjs/mapped-types';
+import { compareSync } from 'bcryptjs';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { User } from './entities/user.entity';
 import { FilterQuery } from 'mongoose';
@@ -19,7 +19,7 @@ export class UserService {
    * @param user User
    * @returns Promise<User>
    */
-  create(user: CreateUserDto) {
+  public create(user: CreateUserDto) {
     return this.model.create(user);
   }
 
@@ -29,7 +29,7 @@ export class UserService {
    * @param data  UpdateUserDto
    * @returns Promise<User>
    */
-  update(identifier: FilterQuery<User>, data: UpdateUserDto) {
+  public update(identifier: FilterQuery<User>, data: UpdateUserDto) {
     return this.model.findOneAndUpdate(identifier, data, { new: true });
   }
 
@@ -38,7 +38,7 @@ export class UserService {
    * @param identifier FilterQuery<User>
    * @returns Promise<User>
    */
-  getUser(identifier: FilterQuery<User>): Promise<User> {
+  public getUser(identifier: FilterQuery<User>): Promise<User> {
     return this.model.findOne(identifier).exec();
   }
 
@@ -47,7 +47,7 @@ export class UserService {
    * @param identifier FilterQuery<User>
    * @returns  Promise<User>
    */
-  delete(identifier: FilterQuery<User>) {
+  public delete(identifier: FilterQuery<User>) {
     return this.model.deleteOne(identifier);
   }
 
@@ -55,7 +55,17 @@ export class UserService {
    * Delete all users
    * @returns
    */
-  deleteAll() {
+  public deleteAll() {
     return this.model.deleteMany({});
+  }
+
+  /**
+   * Compare user password
+   * @param user User - User to check
+   * @param password  string - password to compare
+   * @returns boolean
+   */
+  public comparePassword(user: User, password: string) {
+    return compareSync(password, user.password);
   }
 }
