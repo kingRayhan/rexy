@@ -1,15 +1,15 @@
-import { Module } from '@nestjs/common';
-import { AppController } from '@/app.controller';
-import { AppService } from '@/app.service';
-import { UserModule } from '@/api/user/user.module';
+import { AuthModule } from '@/api/auth/auth.module';
 import { RoleModule } from '@/api/role/role.module';
 import { SessionModule } from '@/api/session/session.module';
+import { UserModule } from '@/api/user/user.module';
+import { AppController } from '@/app.controller';
+import { AppService } from '@/app.service';
+import configs from '@/app/config';
 import { MailModule } from '@/shared/mail/mail.module';
 import { NotificationModule } from '@/shared/notification/notification.module';
-import { TypegooseModule } from 'nestjs-typegoose';
-import configs from '@/app/config';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthModule } from '@/api/auth/auth.module';
+import { TypegooseModule } from 'nestjs-typegoose';
 import { TestDatabaseModule } from './shared/test-database/test-database.module';
 
 @Module({

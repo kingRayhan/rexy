@@ -4,4 +4,6 @@ export enum AppMessage {
   EMAIL_ALREADY_EXISTS = 'Email already exists',
   USER_NOT_FOUND = 'User not found',
   REGISTER_SUCCESS = 'Register success',
+  LOGOUT_SUCCESS = 'Logout success',
+  LOGIN_SUCCESS = 'Login success',
 }

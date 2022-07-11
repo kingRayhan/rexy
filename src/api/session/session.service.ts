@@ -1,9 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { hashSync } from 'bcryptjs';
 import { sign as jwtSign } from 'jsonwebtoken';
 import { InjectModel } from 'nestjs-typegoose';
-import { UserService } from '../user/user.service';
 import { Session } from './entities/session.entity';
 
 @Injectable()

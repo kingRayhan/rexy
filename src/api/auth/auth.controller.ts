@@ -1,10 +1,18 @@
 import AppResponse from '../../app/utils/app-response.class';
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthLoginDTO } from './dto/login.dto';
 import { AuthRegisterDTO } from './dto/register.dto';
 import { AppMessage } from '../../app/utils/messages.enum';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 @ApiTags('Authentication')
@@ -28,8 +36,20 @@ export class AuthController {
     const data = await this.authService.login(payload);
     return new AppResponse({
       statusCode: HttpStatus.OK,
-      message: 'Login successful',
+      message: AppMessage.LOGIN_SUCCESS,
       data,
+    });
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  async logout() {
+    // await this.authService.logout();
+    return new AppResponse({
+      statusCode: HttpStatus.OK,
+      message: AppMessage.LOGOUT_SUCCESS,
     });
   }
 }
