@@ -1,10 +1,12 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import * as request from 'supertest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { getModelToken } from 'nestjs-typegoose';
+import * as request from 'supertest';
+import validationOptions from '../../app/utils/validation-options';
 import configs from '../../app/config';
+import { AppMessage } from '../../app/utils/messages.enum';
 import { TestDatabaseModule } from '../../shared/test-database/test-database.module';
 import { SessionModule } from '../session/session.module';
 import { User } from '../user/entities/user.entity';
@@ -35,12 +37,105 @@ describe('AuthController', () => {
 
     app = module.createNestApplication();
     app.enableShutdownHooks();
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(new ValidationPipe(validationOptions));
     await app.init();
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+  describe('POST /auth/register', () => {
+    it('Register route defined', () => {
+      expect(controller.register).toBeDefined();
+    });
+
+    it('Register a new user', async () => {
+      await userModel.deleteMany({});
+      const user = {
+        name: 'King Rayhan',
+        username: 'rayhan',
+        email: 'example@example.com',
+        password: '123456',
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/auth/register')
+        .send(user);
+
+      expect(response.status).toBe(HttpStatus.CREATED);
+      expect(response.body.message).toBe(AppMessage.REGISTER_SUCCESS);
+      expect(response.body.data).toBeDefined();
+    });
+
+    it('validation error (throw 422): For empty body', async () => {
+      await userModel.deleteMany({});
+      const user = {};
+
+      const response = await request(app.getHttpServer())
+        .post('/auth/register')
+        .send(user);
+
+      expect(response.status).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+      expect(response.body.errors).toHaveProperty('name');
+      expect(response.body.errors).toHaveProperty('username');
+      expect(response.body.errors).toHaveProperty('email');
+      expect(response.body.errors).toHaveProperty('password');
+    });
+
+    it('validation error (throw 422): For invalid email', async () => {
+      await userModel.deleteMany({});
+
+      const user = {
+        name: 'King Rayhan',
+        username: 'rayhan',
+        email: 'example',
+        password: '123456',
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/auth/register')
+        .send(user);
+
+      expect(response.status).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+      expect(response.body.errors).toHaveProperty('email');
+    });
+
+    it('validation error (throw 403): For already exists email', async () => {
+      await userModel.deleteMany({});
+      const user = {
+        name: 'King Rayhan',
+        username: 'rayhan',
+        email: 'example@example.com',
+        password: '123456',
+      };
+      await userModel.create(user);
+
+      const response = await request(app.getHttpServer())
+        .post('/auth/register')
+        .send({ ...user, username: 'xxx' });
+
+      expect(response.status).toBe(HttpStatus.FORBIDDEN);
+      expect(response.body.message).toBe(AppMessage.EMAIL_ALREADY_EXISTS);
+    });
+
+    it('validation error (throw 403): For already exists username', async () => {
+      await userModel.deleteMany({});
+      const user = {
+        name: 'King Rayhan',
+        username: 'rayhan',
+        email: 'example@example.com',
+        password: '123456',
+      };
+      await userModel.create(user);
+
+      const response = await request(app.getHttpServer())
+        .post('/auth/register')
+        .send({ ...user, email: 'test@test123.com' });
+
+      expect(response.status).toBe(HttpStatus.FORBIDDEN);
+      expect(response.body.message).toBe(AppMessage.USERNAME_ALREADY_EXISTS);
+    });
   });
 
   describe('POST /auth/login', () => {
@@ -101,7 +196,7 @@ describe('AuthController', () => {
       });
       expect(res.status).toBe(403);
       expect(res.body).toHaveProperty('message');
-      expect(res.body.message).toBe('Invalid credential');
+      expect(res.body.message).toBe(AppMessage.INVALID_CREDENTIALS);
     });
 
     it('Throw 403: For invalid username & valid password', async () => {
@@ -119,7 +214,7 @@ describe('AuthController', () => {
       });
       expect(res.status).toBe(403);
       expect(res.body).toHaveProperty('message');
-      expect(res.body.message).toBe('Invalid credential');
+      expect(res.body.message).toBe(AppMessage.INVALID_CREDENTIALS);
     });
   });
 });

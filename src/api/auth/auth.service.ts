@@ -1,3 +1,4 @@
+import { AppMessage } from '../../app/utils/messages.enum';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { SessionService } from '../session/session.service';
 import { UserService } from '../user/user.service';
@@ -22,7 +23,7 @@ export class AuthService {
       username: payload.username,
     });
     if (Boolean(userNameExists))
-      throw new ForbiddenException('Username already exists');
+      throw new ForbiddenException(AppMessage.USERNAME_ALREADY_EXISTS);
 
     /**
      * Check if user exists with the same email
@@ -31,7 +32,7 @@ export class AuthService {
       email: payload.email,
     });
     if (Boolean(emailExists))
-      throw new ForbiddenException('Email already exists');
+      throw new ForbiddenException(AppMessage.EMAIL_ALREADY_EXISTS);
 
     const user = await this.userService.create({
       ...payload,
@@ -52,14 +53,15 @@ export class AuthService {
     const fetchUser = await this.userService.getUser({
       [_user ? 'email' : 'username']: payload.user,
     });
-    if (!Boolean(fetchUser)) throw new ForbiddenException('Invalid credential');
+    if (!Boolean(fetchUser))
+      throw new ForbiddenException(AppMessage.INVALID_CREDENTIALS);
 
     const isPasswordValid = this.userService.comparePassword(
       fetchUser,
       payload.password,
     );
     if (!Boolean(isPasswordValid))
-      throw new ForbiddenException('Invalid credential');
+      throw new ForbiddenException(AppMessage.INVALID_CREDENTIALS);
 
     return this.sessionService.claimToken(fetchUser._id);
   }
