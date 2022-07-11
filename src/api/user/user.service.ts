@@ -42,6 +42,10 @@ export class UserService {
     return this.model.findOne(identifier).exec();
   }
 
+  public async getUserById(id: string) {
+    return this.model.findById(id).exec();
+  }
+
   /**
    * Delete a user
    * @param identifier FilterQuery<User>

@@ -90,7 +90,7 @@ describe('AuthService', () => {
     });
   });
 
-  it('authService.login -> Login a user', async () => {
+  it('authService.login -> Get access and refresh token using username and password', async () => {
     const payload: AuthRegisterDTO = {
       email: 'john@gmail.com',
       password: '123456',
@@ -106,8 +106,47 @@ describe('AuthService', () => {
       })
       .then((res) => {
         expect(res).toBeDefined();
-        console.log({ res });
-        // expect(res).toBe('Logged in successfully');
+        expect(res.accessToken).toBeDefined();
+        expect(res.refreshToken).toBeDefined();
+      });
+  });
+
+  it('authService.login -> get 403 for invalid username', async () => {
+    const payload: AuthRegisterDTO = {
+      email: 'john@gmail.com',
+      password: '123456',
+      name: 'John Doe',
+      username: 'johndoe',
+    };
+    await userModel.create(payload);
+
+    service
+      .login({
+        user: 'wrong-username',
+        password: payload.password,
+      })
+      .catch((err) => {
+        expect(err.status).toBe(403);
+        expect(err.message).toBe('Invalid credential');
+      });
+  });
+
+  it('authService.login -> get 403 for invalid password', async () => {
+    const payload: AuthRegisterDTO = {
+      email: 'john@gmail.com',
+      password: '123456',
+      name: 'John Doe',
+      username: 'johndoe',
+    };
+    await userModel.create(payload);
+    service
+      .login({
+        user: payload.username,
+        password: 'wrong---password',
+      })
+      .catch((err) => {
+        expect(err.status).toBe(403);
+        expect(err.message).toBe('Invalid credential');
       });
   });
 });

@@ -52,17 +52,16 @@ export class AuthService {
     const fetchUser = await this.userService.getUser({
       [_user ? 'email' : 'username']: payload.user,
     });
-
-    if (!fetchUser) throw new ForbiddenException('Invalid credentials');
+    if (!Boolean(fetchUser)) throw new ForbiddenException('Invalid credential');
 
     const isPasswordValid = this.userService.comparePassword(
       fetchUser,
       payload.password,
     );
-    if (!isPasswordValid) throw new ForbiddenException('Invalid credentials');
+    if (!Boolean(isPasswordValid))
+      throw new ForbiddenException('Invalid credential');
 
-    const session = await this.sessionService.createSession(fetchUser._id);
-    return session;
+    return this.sessionService.claimToken(fetchUser._id);
   }
 
   /**

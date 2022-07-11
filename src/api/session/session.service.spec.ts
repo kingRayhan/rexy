@@ -11,7 +11,7 @@ describe('SessionService', () => {
   let service: SessionService;
   let model: ReturnModelType<typeof Session>;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
@@ -30,7 +30,7 @@ describe('SessionService', () => {
 
     await model.deleteMany();
   });
-  afterAll(async () => {
+  beforeEach(async () => {
     await model.deleteMany();
   });
 
@@ -50,16 +50,19 @@ describe('SessionService', () => {
 
   it('sessionService.createSession -> create session', async () => {
     const subscriber = '62a9b253fc13ae4f6b000015';
-    const session = await service.createSession(subscriber);
+    const session = await service.storeSessionToDatabase(
+      subscriber,
+      'rt_secret',
+    );
 
     expect(session).toBeDefined();
     expect(session.subscriber.toString()).toBe(subscriber);
   });
 
-  it('sessionService.generateRefreshTokenSecret -> generate a new refresh token secret for a given user id', async () => {
-    const secret = service.generateRefreshTokenSecret(
-      '62a9b253fc13ae4f6b000015',
-    );
-    expect(secret).toBeDefined();
-  });
+  // it('sessionService.generateRefreshTokenSecret -> generate a new refresh token secret for a given user id', async () => {
+  //   const secret = service.generateRefreshTokenSecret(
+  //     '62a9b253fc13ae4f6b000015',
+  //   );
+  //   expect(secret).toBeDefined();
+  // });
 });
