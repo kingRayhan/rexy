@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { getModelToken } from 'nestjs-typegoose';
 import configs from '../../app/config';
+import { AppMessage } from '../../app/utils/messages.enum';
 import { TestDatabaseModule } from '../../shared/test-database/test-database.module';
 import { SessionModule } from '../session/session.module';
 import { User } from '../user/entities/user.entity';
@@ -78,7 +79,7 @@ describe('AuthService', () => {
 
     service.register({ ...payload, email: 'xxx1@xx.com' }).catch((err) => {
       expect(err.status).toBe(403);
-      expect(err.message).toBe('Username already exists');
+      expect(err.message).toBe(AppMessage.USERNAME_ALREADY_EXISTS);
     });
     await userModel.deleteMany({});
   });
@@ -96,7 +97,7 @@ describe('AuthService', () => {
 
     service.register({ ...payload, username: 'xxx1' }).catch((err) => {
       expect(err.status).toBe(403);
-      expect(err.message).toBe('Email already exists');
+      expect(err.message).toBe(AppMessage.EMAIL_ALREADY_EXISTS);
     });
     await userModel.deleteMany({});
   });
@@ -141,7 +142,7 @@ describe('AuthService', () => {
       })
       .catch((err) => {
         expect(err.status).toBe(403);
-        expect(err.message).toBe('Invalid credential');
+        expect(err.message).toBe(AppMessage.INVALID_CREDENTIALS);
       });
     await userModel.deleteMany({});
   });
@@ -162,7 +163,7 @@ describe('AuthService', () => {
       })
       .catch((err) => {
         expect(err.status).toBe(403);
-        expect(err.message).toBe('Invalid credential');
+        expect(err.message).toBe(AppMessage.INVALID_CREDENTIALS);
       });
     await userModel.deleteMany({});
   });
