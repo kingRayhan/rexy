@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { UserModule } from '../user/user.module';
 import { SessionModule } from '../session/session.module';
 import { PassportModule } from '@nestjs/passport';
-import { PassportJWTAccessTokenStrategy } from './passport-stategies/jwt';
+import { PassportJWTAccessTokenStrategy } from './passport-stategies/jwt-at';
 
 @Module({
   imports: [UserModule, SessionModule, PassportModule],

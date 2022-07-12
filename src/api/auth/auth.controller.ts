@@ -1,18 +1,19 @@
-import AppResponse from '../../app/utils/app-response.class';
 import {
   Body,
   Controller,
   HttpCode,
   HttpStatus,
   Post,
-  UseGuards,
+  Req,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
+import AppResponse from '../../app/utils/app-response.class';
+import { AppMessage } from '../../app/utils/messages.enum';
 import { AuthService } from './auth.service';
+import { Authenticated } from './decorators/authenticated.decorator';
 import { AuthLoginDTO } from './dto/login.dto';
 import { AuthRegisterDTO } from './dto/register.dto';
-import { AppMessage } from '../../app/utils/messages.enum';
-import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 @ApiTags('Authentication')
@@ -41,12 +42,11 @@ export class AuthController {
     });
   }
 
-  @Post('logout')
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  async logout() {
-    // await this.authService.logout();
+  @Authenticated()
+  @Post('logout')
+  async logout(@Req() request: Request) {
+    await this.authService.logout(request['user']['session_id']);
     return new AppResponse({
       statusCode: HttpStatus.OK,
       message: AppMessage.LOGOUT_SUCCESS,

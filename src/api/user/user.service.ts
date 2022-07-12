@@ -38,12 +38,15 @@ export class UserService {
    * @param identifier FilterQuery<User>
    * @returns Promise<User>
    */
-  public getUser(identifier: FilterQuery<User>): Promise<User> {
-    return this.model.findOne(identifier).exec();
+  public getUser(
+    identifier: FilterQuery<User>,
+    fields?: string,
+  ): Promise<User> {
+    return this.model.findOne(identifier).select(fields).exec();
   }
 
-  public async getUserById(id: string) {
-    return this.model.findById(id).exec();
+  public async getUserById(id: string, fields?: string) {
+    return this.model.findById(id).select(fields).exec();
   }
 
   /**
