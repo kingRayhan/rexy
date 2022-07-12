@@ -39,7 +39,6 @@
     "cowsay": "^1.5.0",
     "jsonwebtoken": "^8.5.1",
     "md5": "^2.3.0",
-    "module-alias": "^2.2.2",
     "mongoose": "^6.4.0",
     "nestjs-typegoose": "^7.1.38",
     "passport": "^0.6.0",
