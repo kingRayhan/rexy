@@ -5,12 +5,15 @@ import {
   HttpStatus,
   Post,
   Req,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import AppResponse from '../../app/utils/app-response.class';
 import { AppMessage } from '../../app/utils/messages.enum';
 import { AuthService } from './auth.service';
+import { AuthStrategy } from './contracts/AuthStategy.enum';
 import { Authenticated } from './decorators/authenticated.decorator';
 import { AuthLoginDTO } from './dto/login.dto';
 import { AuthRegisterDTO } from './dto/register.dto';
@@ -50,6 +53,19 @@ export class AuthController {
     return new AppResponse({
       statusCode: HttpStatus.OK,
       message: AppMessage.LOGOUT_SUCCESS,
+    });
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(AuthStrategy.AUTH_JWT_REFRESH_TOKEN))
+  async refresh(@Req() request: Request) {
+    const data = await this.authService.refresh(request['user']['session_id']);
+    return new AppResponse({
+      statusCode: HttpStatus.OK,
+      message: AppMessage.TOKEN_REFRESH,
+      data,
     });
   }
 }

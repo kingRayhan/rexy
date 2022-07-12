@@ -22,18 +22,18 @@ export class SessionService {
    */
   async claimToken(subscriber: string) {
     // Refresh token secret for this specific claim
-    const rt_secret = this.generateRefreshTokenSecret(subscriber);
+    const rt_token = this.generateRefreshTokenSecret(subscriber);
 
-    // Store rt_secret in database
+    // Store rt_token in database
     const { id: session_id } = await this.storeSessionToDatabase(
       subscriber,
-      rt_secret,
+      rt_token,
     );
 
     // Generate access and refresh tokens
     return this.generateAccessAndRefreshTokens(
       subscriber,
-      rt_secret,
+      rt_token,
       session_id,
     );
   }
@@ -45,7 +45,7 @@ export class SessionService {
    */
   public generateAccessAndRefreshTokens(
     subscriber: string,
-    rt_secret: string,
+    rt_token: string,
     session_id: string,
   ) {
     const accessToken = jwtSign(
@@ -53,9 +53,13 @@ export class SessionService {
       this.config.get('auth.access_token_secret'),
       { expiresIn: this.config.get('auth.access_token_expiration') },
     );
-    const refreshToken = jwtSign({ subscriber }, rt_secret, {
-      expiresIn: this.config.get('auth.refresh_token_expiration'),
-    });
+    const refreshToken = jwtSign(
+      { subscriber, session_id, rt_token },
+      this.config.get('auth.refresh_token_secret'),
+      {
+        expiresIn: this.config.get('auth.refresh_token_expiration'),
+      },
+    );
     return { accessToken, refreshToken };
   }
 
@@ -64,8 +68,8 @@ export class SessionService {
    * @param subscriber user_id
    * @returns
    */
-  public async storeSessionToDatabase(subscriber: string, rt_secret: string) {
-    const session = await this.model.create({ subscriber, rt_secret });
+  public async storeSessionToDatabase(subscriber: string, rt_token: string) {
+    const session = await this.model.create({ subscriber, rt_token });
     return session;
   }
 

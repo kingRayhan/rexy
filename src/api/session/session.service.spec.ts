@@ -43,7 +43,7 @@ describe('SessionService', () => {
     const { accessToken, refreshToken } =
       service.generateAccessAndRefreshTokens(
         '62a9b253fc13ae4f6b000015',
-        'rt_secret',
+        'rt_token',
         '62cd1533fc13ae3c95000002',
       );
     expect(accessToken).toBeDefined();
@@ -54,7 +54,7 @@ describe('SessionService', () => {
     const subscriber = '62a9b253fc13ae4f6b000015';
     const session = await service.storeSessionToDatabase(
       subscriber,
-      'rt_secret',
+      'rt_token',
     );
 
     expect(session).toBeDefined();
@@ -75,7 +75,7 @@ describe('SessionService', () => {
       const subscriber = '62cd18c89278aeb09e0eab9c';
       const { _id } = await model.create({
         subscriber,
-        rt_secret: 'rt_secret',
+        rt_token: 'rt_token',
       });
 
       service.getSession({ _id }).then((session) => {
@@ -88,7 +88,7 @@ describe('SessionService', () => {
       const subscriber = '62cd18c89278aeb09e0eab9c';
       await model.create({
         subscriber,
-        rt_secret: 'rt_secret',
+        rt_token: 'rt_token',
       });
 
       service.getSession({ subscriber }).then((session) => {
@@ -113,15 +113,15 @@ describe('SessionService', () => {
       const mockSessions = [
         {
           subscriber,
-          rt_secret: 'rt_secret1',
+          rt_token: 'rt_token1',
         },
         {
           subscriber,
-          rt_secret: 'rt_secret2',
+          rt_token: 'rt_token2',
         },
         {
           subscriber,
-          rt_secret: 'rt_secret3',
+          rt_token: 'rt_token3',
         },
       ];
 
@@ -142,7 +142,7 @@ describe('SessionService', () => {
       const subscriber = '62cd18c89278aeb09e0eab9c';
       const { _id } = await model.create({
         subscriber,
-        rt_secret: 'rt_secret',
+        rt_token: 'rt_token',
       });
 
       service.deleteSession({ _id }).then((res) => {
@@ -162,15 +162,15 @@ describe('SessionService', () => {
       const mockSessions = [
         {
           subscriber: subscriber1,
-          rt_secret: 'rt_secret1',
+          rt_token: 'rt_token1',
         },
         {
           subscriber: subscriber1,
-          rt_secret: 'rt_secret2',
+          rt_token: 'rt_token2',
         },
         {
           subscriber: subscriber2,
-          rt_secret: 'rt_secret3',
+          rt_token: 'rt_token3',
         },
       ];
 

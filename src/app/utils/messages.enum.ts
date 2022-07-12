@@ -6,4 +6,5 @@ export enum AppMessage {
   REGISTER_SUCCESS = 'Register success',
   LOGOUT_SUCCESS = 'Logout success',
   LOGIN_SUCCESS = 'Login success',
+  TOKEN_REFRESH = 'New token generated using refresh token',
 }

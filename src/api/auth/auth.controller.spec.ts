@@ -15,6 +15,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { PassportJWTAccessTokenStrategy } from './passport-stategies/jwt-at';
+import { PassportJWTRefreshTokenStrategy } from './passport-stategies/jwt-rt';
 
 describe('AuthController', () => {
   let app: INestApplication;
@@ -33,7 +34,11 @@ describe('AuthController', () => {
         PassportModule,
       ],
       controllers: [AuthController],
-      providers: [AuthService, PassportJWTAccessTokenStrategy],
+      providers: [
+        AuthService,
+        PassportJWTAccessTokenStrategy,
+        PassportJWTRefreshTokenStrategy,
+      ],
     }).compile();
     controller = module.get<AuthController>(AuthController);
     userModel = module.get<ReturnModelType<typeof User>>(getModelToken('User'));
@@ -184,7 +189,7 @@ describe('AuthController', () => {
       expect(res.body).toHaveProperty('data.refreshToken');
     });
 
-    it('Throw 403: For valid username & invalid password', async () => {
+    it('⛔ Throw 403: For valid username & invalid password', async () => {
       await userModel.deleteMany({});
       userModel.create({
         name: 'King Rayhan',
@@ -202,7 +207,7 @@ describe('AuthController', () => {
       expect(res.body.message).toBe(AppMessage.INVALID_CREDENTIALS);
     });
 
-    it('Throw 403: For invalid username & valid password', async () => {
+    it('⛔ Throw 403: For invalid username & valid password', async () => {
       await userModel.deleteMany({});
       userModel.create({
         name: 'King Rayhan',
@@ -253,13 +258,79 @@ describe('AuthController', () => {
       expect(logoutResponse.body.message).toBe(AppMessage.LOGOUT_SUCCESS);
     });
 
-    it('throw 401 for invalid access token', async () => {
+    it('⛔ throw 401 for invalid access token', async () => {
       const logoutResponse = await request(app.getHttpServer())
         .post('/auth/logout')
         .set('Authorization', `Bearer invalid-access-token`);
 
       expect(logoutResponse.status).toBe(HttpStatus.UNAUTHORIZED);
       expect(logoutResponse.body).toHaveProperty('message');
+    });
+  });
+
+  describe('POST /auth/refresh', () => {
+    it('Refresh route defined', () => {
+      expect(controller.refresh).toBeDefined();
+    });
+
+    it('Refresh using valid refresh token', async () => {
+      await userModel.deleteMany({});
+      userModel.create({
+        name: 'King Rayhan',
+        username: 'rayhan',
+        email: 'example@example.com',
+        password: '123456',
+      });
+
+      const loginResponse = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          user: 'rayhan',
+          password: '123456',
+        });
+      const refreshToken = loginResponse.body.data.refreshToken;
+
+      const refreshResponse = await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .set('Authorization', `Bearer ${refreshToken}`);
+
+      expect(refreshResponse.status).toBe(200);
+      expect(refreshResponse.body).toHaveProperty('message');
+      expect(refreshResponse.body.message).toBe(AppMessage.TOKEN_REFRESH);
+    });
+
+    it('⛔ throw 401: For invalid refresh token', async () => {
+      const refreshResponse = await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .set('Authorization', `Bearer invalid-refresh-token`);
+      expect(refreshResponse.status).toBe(HttpStatus.UNAUTHORIZED);
+    });
+
+    it('⛔ throw 401: After refreshing using a refresh token then that token will not work again', async () => {
+      await userModel.deleteMany({});
+      userModel.create({
+        name: 'King Rayhan',
+        username: 'rayhan',
+        email: 'example@example.com',
+        password: '123456',
+      });
+      const loginResponse = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          user: 'rayhan',
+          password: '123456',
+        });
+      const prev___refreshToken = loginResponse.body.data.refreshToken;
+
+      await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .set('Authorization', `Bearer ${prev___refreshToken}`);
+
+      const refreshAgain = await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .set('Authorization', `Bearer ${prev___refreshToken}`);
+
+      expect(refreshAgain.status).toBe(HttpStatus.UNAUTHORIZED);
     });
   });
 });

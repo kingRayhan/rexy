@@ -66,8 +66,23 @@ export class AuthService {
     return this.sessionService.claimToken(fetchUser._id);
   }
 
+  /**
+   * Logout a user session using session id
+   * @param session_id string - session id
+   * @returns
+   */
   public async logout(session_id: string) {
     return this.sessionService.deleteSession({ _id: session_id });
+  }
+
+  /**
+   * Delete previous session & create new session
+   * @param session_id string - session id
+   * @returns
+   */
+  public async refresh(session_id: string) {
+    await this.sessionService.deleteSession({ _id: session_id });
+    return this.sessionService.claimToken(session_id);
   }
 
   /**

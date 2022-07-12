@@ -15,5 +15,5 @@ export class Session {
   subscriber: User;
 
   @prop({ required: true })
-  rt_secret: string;
+  rt_token: string;
 }
