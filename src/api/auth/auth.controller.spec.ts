@@ -13,6 +13,8 @@ import { User } from '../user/entities/user.entity';
 import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { PassportModule } from '@nestjs/passport';
+import { PassportJWTAccessTokenStrategy } from './passport-stategies/jwt-at';
 
 describe('AuthController', () => {
   let app: INestApplication;
@@ -28,9 +30,10 @@ describe('AuthController', () => {
         TestDatabaseModule,
         UserModule,
         SessionModule,
+        PassportModule,
       ],
       controllers: [AuthController],
-      providers: [AuthService],
+      providers: [AuthService, PassportJWTAccessTokenStrategy],
     }).compile();
     controller = module.get<AuthController>(AuthController);
     userModel = module.get<ReturnModelType<typeof User>>(getModelToken('User'));
@@ -215,6 +218,48 @@ describe('AuthController', () => {
       expect(res.status).toBe(403);
       expect(res.body).toHaveProperty('message');
       expect(res.body.message).toBe(AppMessage.INVALID_CREDENTIALS);
+    });
+  });
+
+  describe('POST /auth/logout', () => {
+    it('Logout route defined', () => {
+      expect(controller.logout).toBeDefined();
+    });
+
+    it('Logout using a valid access token', async () => {
+      await userModel.deleteMany({});
+      userModel.create({
+        name: 'King Rayhan',
+        username: 'rayhan',
+        email: 'example@example.com',
+        password: '123456',
+      });
+
+      const loginResponse = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          user: 'rayhan',
+          password: '123456',
+        });
+
+      const accessToken = loginResponse.body.data.accessToken;
+
+      const logoutResponse = await request(app.getHttpServer())
+        .post('/auth/logout')
+        .set('Authorization', `Bearer ${accessToken}`);
+
+      expect(logoutResponse.status).toBe(200);
+      expect(logoutResponse.body).toHaveProperty('message');
+      expect(logoutResponse.body.message).toBe(AppMessage.LOGOUT_SUCCESS);
+    });
+
+    it('throw 401 for invalid access token', async () => {
+      const logoutResponse = await request(app.getHttpServer())
+        .post('/auth/logout')
+        .set('Authorization', `Bearer invalid-access-token`);
+
+      expect(logoutResponse.status).toBe(HttpStatus.UNAUTHORIZED);
+      expect(logoutResponse.body).toHaveProperty('message');
     });
   });
 });
