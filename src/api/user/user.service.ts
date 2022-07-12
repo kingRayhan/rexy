@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
 import { compareSync } from 'bcryptjs';
 import { ReturnModelType } from '@typegoose/typegoose';
@@ -28,9 +28,18 @@ export class UserService {
    * @param identifier FilterQuery<User>
    * @param data  UpdateUserDto
    * @returns Promise<User>
+   * @throws NotFoundException - If the user is not found
    */
-  public update(identifier: FilterQuery<User>, data: UpdateUserDto) {
-    return this.model.findOneAndUpdate(identifier, data, { new: true });
+  public async update(identifier: FilterQuery<User>, data: UpdateUserDto) {
+    const updated = await this.model.findOneAndUpdate(identifier, data, {
+      new: true,
+    });
+
+    if (!Boolean(updated)) {
+      throw new NotFoundException();
+    }
+
+    return updated;
   }
 
   /**
@@ -52,10 +61,14 @@ export class UserService {
   /**
    * Delete a user
    * @param identifier FilterQuery<User>
-   * @returns  Promise<User>
+   * @throws NotFoundException - If the user is not found
    */
-  public delete(identifier: FilterQuery<User>) {
-    return this.model.deleteOne(identifier);
+  public async delete(identifier: FilterQuery<User>) {
+    const deleted = await this.model.deleteOne(identifier);
+    if (deleted.deletedCount === 0) {
+      throw new NotFoundException();
+    }
+    return deleted;
   }
 
   /**

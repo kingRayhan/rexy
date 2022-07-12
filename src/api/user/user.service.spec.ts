@@ -48,102 +48,166 @@ describe('UserService', () => {
     await model.deleteMany({});
   });
 
-  it('userService.create -> Create a new user', async () => {
-    const userData = {
-      name: 'John Doe',
-      username: 'johndoe',
-      email: 'john@gmail.com',
-      password: '123456',
-    };
-    service.create(userData).then((user) => {
-      expect(user.name).toBe(userData.name);
-      expect(user.username).toBe(userData.username);
-      expect(user.email).toBe(userData.email);
-      expect(user.password).not.toBe(userData.password); // 🤖: because password is hashed
+  describe('userService.create', () => {
+    it('userService.create -> Create a new user', async () => {
+      const userData = {
+        name: 'John Doe',
+        username: 'johndoe',
+        email: 'john@gmail.com',
+        password: '123456',
+      };
+      service.create(userData).then((user) => {
+        expect(user.name).toBe(userData.name);
+        expect(user.username).toBe(userData.username);
+        expect(user.email).toBe(userData.email);
+        expect(user.password).not.toBe(userData.password); // 🤖: because password is hashed
+      });
     });
+
+    it('⛔ throw error for empty username, email and password', async () => {
+      await expect(
+        service.create({
+          username: '',
+          email: '',
+          password: '',
+        }),
+      ).rejects.toThrow();
+    });
+
+    // it('⛔ throw error for duplicate username', async () => {
+    //   await model.create({
+    //     username: 'johndoe',
+    //     email: 'example@example.com',
+    //     password: '123456',
+    //   });
+
+    //   await expect(
+    //     service.create({
+    //       username: 'johndoe',
+    //       email: '123@example.com',
+    //       password: '1234567',
+    //     }),
+    //   ).rejects.toThrow();
+    // });
+
+    // it('⛔ throw error for duplicate email', async () => {
+    //   await model.create({
+    //     username: 'johndoe',
+    //     email: 'example@example.com',
+    //     password: '123456',
+    //   });
+
+    //   await expect(
+    //     service.create({
+    //       username: 'johndoe1',
+    //       email: 'example@example.com',
+    //       password: '123456',
+    //     }),
+    //   ).rejects.toThrow();
+    // });
   });
 
-  it('userService.getUser -> fetch a user using username and email', async () => {
-    const users = [
-      {
+  describe('userService.getUser', () => {
+    it('fetch user using _id', async () => {
+      const user = {
         name: 'Nibbi',
         username: 'nibbi',
         email: 'nibbi@gmail.com',
         password: '123456',
-      },
-      {
-        name: 'toxic',
-        username: 'toxic',
-        email: 'toxic@toxic.com',
-        password: '123456',
-      },
-      {
-        name: 'adhu',
-        username: 'adhunika',
-        email: 'adhunika92@gmail.com',
-        password: '123456',
-      },
-      {
+      };
+      const saved = await model.create(user);
+
+      service.getUser({ _id: saved._id }).then((user) => {
+        expect(user).toBeDefined();
+        expect(user.name).toBe(user.name);
+        expect(user.username).toBe(user.username);
+        expect(user.email).toBe(user.email);
+      });
+    });
+
+    it('fetch user using username', async () => {
+      const user = {
         name: 'orchie',
         username: 'orchie',
         email: 'orchie@orchie.com',
         password: '123456',
-      },
-      {
+      };
+      const saved = await model.create(user);
+
+      service.getUser({ username: saved.username }).then((user) => {
+        expect(user).toBeDefined();
+        expect(user.name).toBe(user.name);
+        expect(user.username).toBe(user.username);
+        expect(user.email).toBe(user.email);
+      });
+    });
+
+    it('return null if user not found', async () => {
+      service.getUser({ username: 'notfound' }).then((user) => {
+        expect(user).toBeNull();
+      });
+    });
+  });
+
+  describe('userService.delete', () => {
+    it('Delete a user using username', async () => {
+      const user = {
+        name: 'Nibbi',
+        username: 'nibbi',
+        email: 'nibbi@nibbi.com',
+        password: '123456',
+      };
+      const saved = await model.create(user);
+
+      service.delete({ username: saved.username }).then((deleted) => {
+        expect(deleted.acknowledged).toBe(true);
+        expect(deleted.deletedCount).toBe(1);
+      });
+    });
+    it('Delete a user using email', async () => {
+      const user = {
         name: 'nishu',
         username: 'nishu',
         email: 'nishu@nishu.com',
         password: '123456',
-      },
-    ];
+      };
+      const saved = await model.create(user);
 
-    await model.insertMany(users);
-
-    service.getUser({ username: users[0].username }).then((user) => {
-      expect(user).toBeDefined();
-      expect(user.name).toBe(users[0].name);
-      expect(user.username).toBe(users[0].username);
-      expect(user.email).toBe(users[0].email);
-    });
-
-    service.getUser({ email: users[1].email }).then((user) => {
-      expect(user).toBeDefined();
-      expect(user.name).toBe(users[1].name);
-      expect(user.username).toBe(users[1].username);
-      expect(user.email).toBe(users[1].email);
-    });
-  });
-
-  it('userService.delete -> delete a user using username', async () => {
-    service.delete({ username: 'nibbi' }).then((deleted) => {
-      expect(deleted.acknowledged).toBe(true);
-    });
-  });
-
-  it('userService.delete -> delete a user using email', async () => {
-    service.delete({ email: 'nishu@nishu.com' }).then((deleted) => {
-      expect(deleted.acknowledged).toBe(true);
-    });
-  });
-
-  it('userService.update -> update a user using username', async () => {
-    const userData = {
-      name: 'John Doe',
-      username: 'johndoe',
-      email: 'john@gmail.com',
-      password: '123456',
-    };
-    await model.create(userData);
-    const updatedUser = {
-      name: 'John Doe 2',
-      username: 'johndoe2',
-    };
-    service
-      .update({ username: userData.username }, updatedUser)
-      .then((user) => {
-        expect(user.name).toBe(updatedUser.name);
-        expect(user.username).toBe(updatedUser.username);
+      service.delete({ email: saved.email }).then((deleted) => {
+        expect(deleted.acknowledged).toBe(true);
+        expect(deleted.deletedCount).toBe(1);
       });
+    });
+    it('⛔ throw error for user not found', async () => {
+      await expect(
+        service.delete({ username: 'notfound' }),
+      ).rejects.toThrowError();
+    });
+  });
+
+  describe('userService.update', () => {
+    it('Update a user using username', async () => {
+      const userData = {
+        name: 'John Doe',
+        username: 'johndoe',
+        email: 'john@gmail.com',
+        password: '123456',
+      };
+      await model.create(userData);
+
+      service
+        .update({ username: userData.username }, { name: 'John Doe2' })
+        .then((user) => {
+          expect(user).toBeDefined();
+          expect(user.name).toBe('John Doe2');
+        });
+    });
+
+    it('⛔ throw error for user not found', async () => {
+      await expect(
+        service.update({ username: 'notfound' }, { name: 'John Doe2' }),
+      ).rejects.toThrow();
+    });
   });
 
   it('userService.comparePassword -> Compare user password', async () => {
