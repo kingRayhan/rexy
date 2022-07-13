@@ -16,7 +16,6 @@ describe('SessionService', () => {
       imports: [
         ConfigModule.forRoot({
           load: configs,
-          isGlobal: true,
         }),
         TestDatabaseModule,
         TypegooseModule.forFeature([Session]),

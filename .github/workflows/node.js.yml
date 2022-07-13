@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [16.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -25,7 +25,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-
+      - name: SMTP Mail Server
+        uses: upgundecha/start-sendria-github-action@v1.0.0
+        with:
+          smtp-port: 1025
+          http-port: 1080
       - name: Install dependencies
         run: npm install --force
 
