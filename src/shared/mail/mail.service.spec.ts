@@ -52,7 +52,6 @@ describe('MailService', () => {
     it('render a mail template', async () => {
       const html = service.renderTemplate(MAIL_TEMPLATES.WELCOME);
       expect(html).toBeDefined();
-      console.log({ html });
     });
   });
 });
