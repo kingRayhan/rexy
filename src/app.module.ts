@@ -2,18 +2,21 @@ import { AuthModule } from '@/api/auth/auth.module';
 import { RoleModule } from '@/api/role/role.module';
 import { SessionModule } from '@/api/session/session.module';
 import { UserModule } from '@/api/user/user.module';
-import { AppController } from '@/app.controller';
-import { AppService } from '@/app.service';
 import configs from '@/app/config';
 import { MailModule } from '@/shared/mail/mail.module';
 import { NotificationModule } from '@/shared/notification/notification.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypegooseModule } from 'nestjs-typegoose';
+import { AppTestApisController } from './app.test-apis';
 import { TestDatabaseModule } from './shared/test-database/test-database.module';
 
 @Module({
   imports: [
+    // ---------------------------------------------------------
+    //  Support modules
+    // ---------------------------------------------------------
     ConfigModule.forRoot({
       isGlobal: true,
       load: configs,
@@ -26,6 +29,11 @@ import { TestDatabaseModule } from './shared/test-database/test-database.module'
         uri: config.get('database.url'),
       }),
     }),
+    EventEmitterModule.forRoot(),
+
+    // ---------------------------------------------------------
+    // Application modules
+    // ---------------------------------------------------------
     UserModule,
     RoleModule,
     SessionModule,
@@ -34,7 +42,6 @@ import { TestDatabaseModule } from './shared/test-database/test-database.module'
     AuthModule,
     TestDatabaseModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppTestApisController],
 })
 export class AppModule {}

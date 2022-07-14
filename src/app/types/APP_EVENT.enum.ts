@@ -1,0 +1,3 @@
+export enum APP_EVENT {
+  FIRE_MAILABLE = 'FIRE_MAILABLE',
+}

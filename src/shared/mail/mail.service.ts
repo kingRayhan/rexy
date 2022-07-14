@@ -52,6 +52,24 @@ export class MailService {
   }
 
   /**
+   * Send a mail with a template
+   * @param template MAIL_TEMPLATES enum - the template to use
+   * @param data  any - the data to use
+   * @param to string - the email to send to
+   * @param subject string - the subject of the email
+   * @returns Promise<void>
+   */
+  public async sendMailWithTemplate(
+    template: MAIL_TEMPLATES,
+    data: any,
+    to: string,
+    subject: string,
+  ) {
+    const html = this.renderTemplate(template, data);
+    return this.sendMail({ to, html, subject });
+  }
+
+  /**
    * Render a mail template
    * @param template MAIL_TEMPLATES enum - the template to use
    * @param data any - the data to use
