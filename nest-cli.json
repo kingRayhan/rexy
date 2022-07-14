@@ -4,7 +4,7 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "assets": [
-      "**/*.pug"
+      "shared/mail/templates/*.{pug|css|html}"
     ]
   }
 }
