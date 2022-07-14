@@ -1,10 +1,10 @@
-import { AuthModule } from '@/api/auth/auth.module';
-import { RoleModule } from '@/api/role/role.module';
-import { SessionModule } from '@/api/session/session.module';
-import { UserModule } from '@/api/user/user.module';
-import configs from '@/app/config';
-import { MailModule } from '@/shared/mail/mail.module';
-import { NotificationModule } from '@/shared/notification/notification.module';
+import { AuthModule } from './api/auth/auth.module';
+import { RoleModule } from './api/role/role.module';
+import { SessionModule } from './api/session/session.module';
+import { UserModule } from './api/user/user.module';
+import configs from './app/config';
+import { MailModule } from './shared/mail/mail.module';
+import { NotificationModule } from './shared/notification/notification.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
