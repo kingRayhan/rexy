@@ -56,24 +56,13 @@ describe('MailService', () => {
   });
 
   describe('MailService.sendMailWithTemplate', () => {
-    it('send a text mail', async () => {
+    it('Send welcome Mail Template', async () => {
       const info = await service.sendMailWithTemplate(
         MAIL_TEMPLATES.WELCOME,
         {},
         'rayhan095@gmail.com',
-        'Dummy Mail template',
+        'Dummy Mail template from Test Suite',
       );
-
-      expect(info.messageId).toBeDefined();
-      expect(info.envelope.to).toContain('rayhan095@gmail.com');
-    });
-
-    it('send a html mail', async () => {
-      const info = await service.sendMail({
-        to: 'rayhan095@gmail.com',
-        subject: 'Html Mail',
-        html: '<h1>Test</h1>',
-      });
 
       expect(info.messageId).toBeDefined();
       expect(info.envelope.to).toContain('rayhan095@gmail.com');
