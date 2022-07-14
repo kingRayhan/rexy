@@ -17,7 +17,6 @@ async function bootstrap() {
     .setTitle(config.get('app.name'))
     .setDescription(config.get('app.description'))
     .setVersion('1.0')
-    .addServer('/docs/')
     .addBearerAuth()
     .build();
 
