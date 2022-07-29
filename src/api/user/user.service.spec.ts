@@ -25,20 +25,12 @@ describe('UserService', () => {
 
     service = module.get<UserService>(UserService);
     model = module.get<ReturnModelType<typeof User>>(getModelToken('User'));
+    await model.deleteMany();
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
-
-  // ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-  // I wish to delete users collection before each test
-  // but it's not working as expected. Most likely I am doing something wrong.
-  // Send PR if you know how to fix it.
-  // beforeEach(async () => {
-  //   // await model.deleteMany({});
-  // });
-  // ☢️ For now: delete all users before each test menually 👺
 
   beforeEach(async () => {
     await model.deleteMany({});
@@ -210,18 +202,18 @@ describe('UserService', () => {
     });
   });
 
-  it('userService.comparePassword -> Compare user password', async () => {
-    const user = await model.create({
-      name: 'John Doe',
-      username: 'johndoe',
-      email: 'john@gmail.com',
-      password: 'valid-password',
-    });
+  // it('userService.comparePassword -> Compare user password', async () => {
+  //   const user = await model.create({
+  //     name: 'John Doe',
+  //     username: 'johndoe',
+  //     email: 'john@gmail.com',
+  //     password: 'valid-password',
+  //   });
 
-    const matchResult1 = service.comparePassword(user, 'valid-password');
-    expect(matchResult1).toBe(true);
+  //   const matchResult1 = service.comparePassword(user, 'valid-password');
+  //   expect(matchResult1).toBe(true);
 
-    const matchResult2 = service.comparePassword(user, 'wrong-password');
-    expect(matchResult2).toBe(false);
-  });
+  //   const matchResult2 = service.comparePassword(user, 'wrong-password');
+  //   expect(matchResult2).toBe(false);
+  // });
 });

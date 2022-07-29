@@ -1,4 +1,4 @@
-import { Permission } from '@/api/role/contracts/permission.enum';
+import { Permission } from '../../role/contracts/permission.enum';
 import {
   index,
   ModelOptions,
