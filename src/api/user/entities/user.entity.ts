@@ -1,4 +1,3 @@
-import { Permission } from '../../role/contracts/permission.enum';
 import {
   index,
   ModelOptions,
@@ -8,6 +7,7 @@ import {
   Severity,
 } from '@typegoose/typegoose';
 import { hashSync } from 'bcryptjs';
+import { Permission } from '../../role/contracts/permission.enum';
 import { Role } from '../../role/entities/role.entity';
 
 @ModelOptions({

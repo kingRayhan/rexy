@@ -42,6 +42,7 @@ describe('UserService', () => {
 
   describe('userService.create', () => {
     it('userService.create -> Create a new user', async () => {
+      await model.deleteMany({});
       const userData = {
         name: 'John Doe',
         username: 'johndoe',
@@ -57,6 +58,8 @@ describe('UserService', () => {
     });
 
     it('⛔ throw error for empty username, email and password', async () => {
+      await model.deleteMany({});
+
       await expect(
         service.create({
           username: '',
@@ -66,41 +69,44 @@ describe('UserService', () => {
       ).rejects.toThrow();
     });
 
-    // it('⛔ throw error for duplicate username', async () => {
-    //   await model.create({
-    //     username: 'johndoe',
-    //     email: 'example@example.com',
-    //     password: '123456',
-    //   });
+    it('⛔ throw error for duplicate username', async () => {
+      await model.deleteMany({});
+      await model.create({
+        username: 'johndoe',
+        email: 'example@example.com',
+        password: '123456',
+      });
 
-    //   await expect(
-    //     service.create({
-    //       username: 'johndoe',
-    //       email: '123@example.com',
-    //       password: '1234567',
-    //     }),
-    //   ).rejects.toThrow();
-    // });
+      await expect(
+        service.create({
+          username: 'johndoe',
+          email: '123@example.com',
+          password: '1234567',
+        }),
+      ).rejects.toThrow();
+    });
 
-    // it('⛔ throw error for duplicate email', async () => {
-    //   await model.create({
-    //     username: 'johndoe',
-    //     email: 'example@example.com',
-    //     password: '123456',
-    //   });
+    it('⛔ throw error for duplicate email', async () => {
+      await model.deleteMany({});
+      await model.create({
+        username: 'johndoe',
+        email: 'example@example.com',
+        password: '123456',
+      });
 
-    //   await expect(
-    //     service.create({
-    //       username: 'johndoe1',
-    //       email: 'example@example.com',
-    //       password: '123456',
-    //     }),
-    //   ).rejects.toThrow();
-    // });
+      await expect(
+        service.create({
+          username: 'johndoe1',
+          email: 'example@example.com',
+          password: '123456',
+        }),
+      ).rejects.toThrow();
+    });
   });
 
   describe('userService.getUser', () => {
     it('fetch user using _id', async () => {
+      await model.deleteMany({});
       const user = {
         name: 'Nibbi',
         username: 'nibbi',
@@ -118,6 +124,7 @@ describe('UserService', () => {
     });
 
     it('fetch user using username', async () => {
+      await model.deleteMany({});
       const user = {
         name: 'orchie',
         username: 'orchie',
@@ -135,6 +142,7 @@ describe('UserService', () => {
     });
 
     it('return null if user not found', async () => {
+      await model.deleteMany({});
       service.getUser({ username: 'notfound' }).then((user) => {
         expect(user).toBeNull();
       });
@@ -143,6 +151,7 @@ describe('UserService', () => {
 
   describe('userService.delete', () => {
     it('Delete a user using username', async () => {
+      await model.deleteMany({});
       const user = {
         name: 'Nibbi',
         username: 'nibbi',
@@ -157,6 +166,7 @@ describe('UserService', () => {
       });
     });
     it('Delete a user using email', async () => {
+      await model.deleteMany({});
       const user = {
         name: 'nishu',
         username: 'nishu',
@@ -171,6 +181,7 @@ describe('UserService', () => {
       });
     });
     it('⛔ throw error for user not found', async () => {
+      await model.deleteMany({});
       await expect(
         service.delete({ username: 'notfound' }),
       ).rejects.toThrowError();
@@ -179,6 +190,7 @@ describe('UserService', () => {
 
   describe('userService.update', () => {
     it('Update a user using username', async () => {
+      await model.deleteMany({});
       const userData = {
         name: 'John Doe',
         username: 'johndoe',
@@ -196,24 +208,10 @@ describe('UserService', () => {
     });
 
     it('⛔ throw error for user not found', async () => {
+      await model.deleteMany({});
       await expect(
         service.update({ username: 'notfound' }, { name: 'John Doe2' }),
       ).rejects.toThrow();
     });
   });
-
-  // it('userService.comparePassword -> Compare user password', async () => {
-  //   const user = await model.create({
-  //     name: 'John Doe',
-  //     username: 'johndoe',
-  //     email: 'john@gmail.com',
-  //     password: 'valid-password',
-  //   });
-
-  //   const matchResult1 = service.comparePassword(user, 'valid-password');
-  //   expect(matchResult1).toBe(true);
-
-  //   const matchResult2 = service.comparePassword(user, 'wrong-password');
-  //   expect(matchResult2).toBe(false);
-  // });
 });
