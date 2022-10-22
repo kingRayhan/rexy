@@ -8,4 +8,5 @@ export enum AppMessage {
   LOGIN_SUCCESS = 'Login success',
   LOGIN_USING_COOKIE_SUCCESS = 'Login using cookie success',
   TOKEN_REFRESH = 'New token generated using refresh token',
+  AUTHENTICATED_USER = 'Authenticated user',
 }
