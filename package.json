@@ -39,6 +39,7 @@
     "class-validator": "^0.13.2",
     "cookie-parser": "^1.4.6",
     "cowsay": "^1.5.0",
+    "firebase-admin": "^11.2.0",
     "jsonwebtoken": "^8.5.1",
     "juice": "^8.1.0",
     "md5": "^2.3.0",

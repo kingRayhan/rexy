@@ -4,12 +4,15 @@ import { SessionService } from '../session/session.service';
 import { UserService } from '../user/user.service';
 import { AuthLoginDTO } from './dto/login.dto';
 import { AuthRegisterDTO } from './dto/register.dto';
+import { FirebaseService } from 'src/shared/firebase/firebase.service';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly sessionService: SessionService,
+    private readonly firebaseService: FirebaseService,
   ) {}
 
   public async register(payload: AuthRegisterDTO) {
@@ -46,7 +49,7 @@ export class AuthService {
    * @param payload AuthLoginDTO
    * @returns
    */
-  public async login(payload: AuthLoginDTO) {
+  public async login(payload: AuthLoginDTO): Promise<User> {
     // Is Email or Username
     const _user = this.__isEmail(payload.user);
 
@@ -63,7 +66,7 @@ export class AuthService {
     if (!Boolean(isPasswordValid))
       throw new ForbiddenException(AppMessage.INVALID_CREDENTIALS);
 
-    return this.sessionService.claimToken(fetchUser._id);
+    return fetchUser;
   }
 
   /**
@@ -83,6 +86,32 @@ export class AuthService {
   public async refresh(session_id: string) {
     await this.sessionService.deleteSession({ _id: session_id });
     return this.sessionService.claimToken(session_id);
+  }
+
+  /**
+   * Login a user using firebase token
+   * @param idToken string - firebase id token
+   */
+  public async firebaseLogin(idToken: string): Promise<User> {
+    const decodedToken = await this.firebaseService
+      .getAdminApp()
+      .auth()
+      .verifyIdToken(idToken);
+
+    let _user = await this.userService.getUser({ email: decodedToken.email });
+
+    if (!_user) {
+      _user = await this.userService.create({
+        name: decodedToken.name,
+        email: decodedToken.email,
+        username: decodedToken.email.split('@')[0],
+        password: Date.now().toString(),
+        avatar: decodedToken.picture,
+        emailConfirmed: true,
+      });
+    }
+
+    return _user;
   }
 
   /**

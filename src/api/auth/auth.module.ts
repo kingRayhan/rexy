@@ -6,9 +6,10 @@ import { SessionModule } from '../session/session.module';
 import { PassportModule } from '@nestjs/passport';
 import { PassportJWTAccessTokenStrategy } from './passport-stategies/jwt-at';
 import { PassportJWTRefreshTokenStrategy } from './passport-stategies/jwt-rt';
+import { FirebaseModule } from '../../shared/firebase/firebase.module';
 
 @Module({
-  imports: [UserModule, SessionModule, PassportModule],
+  imports: [UserModule, SessionModule, PassportModule, FirebaseModule],
   controllers: [AuthController],
   providers: [
     AuthService,

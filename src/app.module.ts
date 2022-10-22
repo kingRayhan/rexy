@@ -13,6 +13,7 @@ import { AppTestApisController } from './app.test-apis';
 import { TestDatabaseModule } from './shared/test-database/test-database.module';
 import { ProductsModule } from './api/products/products.module';
 import { RentsModule } from './api/rents/rents.module';
+import { FirebaseModule } from './shared/firebase/firebase.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { RentsModule } from './api/rents/rents.module';
     TestDatabaseModule,
     ProductsModule,
     RentsModule,
+    FirebaseModule,
   ],
   controllers: [AppTestApisController],
 })

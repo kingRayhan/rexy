@@ -35,19 +35,21 @@ export class User {
   @prop({ required: true, unique: true })
   public username: string;
 
+  @prop({ required: false })
+  public avatar?: string;
+
   @prop({ required: true, unique: true })
   public email: string;
 
   @prop({ required: true })
   public password: string;
 
-  // get avatar(): string {
-  //   return 'https://www.gravatar.com/avatar/' + md5(this.email);
-  // }
-
   @prop({ ref: () => Role, required: false })
   role?: Ref<Role>;
 
   @prop({ required: false })
   permissions?: Permission[];
+
+  @prop({ required: false, default: false })
+  emailConfirmed?: boolean;
 }
