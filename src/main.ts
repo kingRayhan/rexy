@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import validationOptions from './app/utils/validation-options';
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
 
   app.setGlobalPrefix(config.get('app.prefix'), {
@@ -32,7 +32,7 @@ async function bootstrap() {
    * Enable cors
    */
   app.enableCors({
-    origin: true,
+    origin: config.get('cors.origin'),
     credentials: true,
   });
 
@@ -50,12 +50,11 @@ async function bootstrap() {
   /**
    * Print the application name and environment.
    */
-  console.log(
-    cowsay.say({
-      text: `App is running at ${config.get('app.url')} | Doc: ${config.get(
-        'app.url',
-      )}/${config.get('app.doc')}`,
-    }),
-  );
+  const cow = cowsay.say({
+    text: `App is running at ${config.get('app.url')} | Doc: ${config.get(
+      'app.url',
+    )}/${config.get('app.doc')}`,
+  });
+  console.log(cow);
 }
 bootstrap();
