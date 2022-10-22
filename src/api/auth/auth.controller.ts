@@ -34,7 +34,7 @@ export class AuthController {
     });
   }
 
-  @Post('login')
+  @Post('login/token')
   @HttpCode(HttpStatus.OK)
   async login(@Body() payload: AuthLoginDTO) {
     const data = await this.authService.login(payload);
