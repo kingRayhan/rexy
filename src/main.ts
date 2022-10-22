@@ -24,6 +24,14 @@ async function bootstrap() {
   SwaggerModule.setup(config.get('app.doc'), app, document);
 
   /**
+   * Enable cors
+   */
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
+
+  /**
    * Validation Pipe for formating validation error
    */
   app.useGlobalPipes(new ValidationPipe(validationOptions));

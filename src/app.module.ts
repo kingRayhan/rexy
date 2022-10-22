@@ -12,6 +12,7 @@ import { TypegooseModule } from 'nestjs-typegoose';
 import { AppTestApisController } from './app.test-apis';
 import { TestDatabaseModule } from './shared/test-database/test-database.module';
 import { ProductsModule } from './api/products/products.module';
+import { RentsModule } from './api/rents/rents.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ProductsModule } from './api/products/products.module';
     AuthModule,
     TestDatabaseModule,
     ProductsModule,
+    RentsModule,
   ],
   controllers: [AppTestApisController],
 })
