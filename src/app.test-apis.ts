@@ -1,7 +1,7 @@
 import { Controller, Post } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ApiTags } from '@nestjs/swagger';
-import { APP_EVENT } from './app/types/APP_EVENT.enum';
+import { APP_EVENT } from './app/contracts/APP_EVENT.enum';
 import { WelcomeMailable } from './shared/mail/mailables/WelcomeMailable';
 
 @ApiTags('Test APIs')
