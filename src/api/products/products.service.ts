@@ -48,11 +48,14 @@ export class ProductsService {
     });
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  update(id: string, updateProductDto: UpdateProductDto) {
+    return this.db.update(
+      { find: { _id: toMongooseObjectId(id) } },
+      updateProductDto,
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  remove(id: string) {
+    return this.db.destroy({ find: { _id: toMongooseObjectId(id) } });
   }
 }

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, Max, Min } from 'class-validator';
 
 export class CreateProductDto {
   @ApiProperty()
@@ -10,9 +10,13 @@ export class CreateProductDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    enum: ['meter', 'plain'],
+    description: 'The type of the product',
+  })
+  @IsEnum(['meter', 'plain'])
   @IsNotEmpty()
-  type: string;
+  type: 'plain' | 'meter';
 
   @ApiProperty()
   @IsNotEmpty()
@@ -37,6 +41,12 @@ export class CreateProductDto {
   @ApiProperty()
   @IsNotEmpty()
   price: number;
+
+  @ApiProperty({ description: 'Discount rate: (1% ~ 99%)', required: false })
+  @IsOptional()
+  @Min(1)
+  @Max(99)
+  discount_rate?: number;
 
   @ApiProperty()
   @IsNotEmpty()

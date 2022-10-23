@@ -12,4 +12,5 @@ export enum AppMessage {
 
   // books
   PRODUCT_BOOKED = 'Product booked',
+  PRODUCT_ALREADY_BOOKED_ERROR = 'Product already booked',
 }

@@ -1,9 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
+import { subDays } from 'date-fns';
 import { InjectModel } from 'nestjs-typegoose';
 import { RequestUser } from 'src/app/contracts/RequestUser.interface';
 import { DatabaseRepository } from 'src/app/database/DatabaseRepository';
+import { AppMessage } from 'src/app/utils/messages.enum';
+import { toMongooseObjectId } from 'src/app/utils/mongoose-helper';
 import { ProductsService } from '../products/products.service';
+import { BOOKING_STATUS } from './contracts/booking-types.enum';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { Booking } from './entities/booking.entity';
 
@@ -17,18 +21,46 @@ export class BookingsService {
     private readonly productsService: ProductsService,
   ) {}
 
+  /**
+   * Create a new booking
+   * @param payload CreateBookingDto
+   * @param authenticatedUser - RequestUser
+   * @returns
+   */
   async create(payload: CreateBookingDto, authenticatedUser: RequestUser) {
-    const product = await this.productsService.findOne(payload.product);
-
-    // dat
-
-    // const booked_for_days =
-    //   payload.end_date.getTime() - payload.start_date.getTime();
-    const booking = new this.model({
-      product: payload.product,
-      // booked_for_days: payload.booked_for_days,
-      user: authenticatedUser.subscriber,
+    const productIsAlreadyBooked = await this.model.findOne({
+      product: { $eq: payload.product },
+      user: { $eq: authenticatedUser.subscriber },
+      status: BOOKING_STATUS.CONSUMING,
     });
-    return booking.save();
+    if (productIsAlreadyBooked) {
+      throw new ForbiddenException(AppMessage.PRODUCT_ALREADY_BOOKED_ERROR);
+    }
+    return this.model.create({
+      product: payload.product,
+      user: authenticatedUser.subscriber,
+      start_date: payload.start_date,
+      estimated_end_date: payload.estimated_end_date,
+    });
+  }
+
+  // async findOne(id: string) {
+  //   return this.db.show({
+  //     find: { _id: toMongooseObjectId(id) },
+  //     population: 'product',
+  //   });
+  // }
+
+  returnBooking(payload: CreateBookingDto, authenticatedUser: RequestUser) {
+    return this.db.update(
+      {
+        find: {
+          product: payload.product,
+          user: authenticatedUser.subscriber,
+          returned: false,
+        },
+      },
+      { returned: true },
+    );
   }
 }

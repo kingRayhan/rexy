@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class CreateBookingDto {
   @ApiProperty({ description: 'The id of the product' })
@@ -7,12 +7,14 @@ export class CreateBookingDto {
   product: string;
 
   @ApiProperty({
-    description: 'Used mileage for this product if applicable',
-    required: false,
+    description: 'Booking start date',
   })
-  @IsOptional()
-  used_mileage?: number;
+  @IsNotEmpty()
+  start_date: Date;
 
-  @ApiProperty({ description: 'Need repair?', default: false, required: false })
-  need_repair: boolean;
+  @ApiProperty({
+    description: 'Booking estimated end date',
+  })
+  @IsNotEmpty()
+  estimated_end_date: Date;
 }

@@ -29,5 +29,8 @@ export class Product {
   price: number;
 
   @prop()
+  discount_rate?: number;
+
+  @prop()
   minimum_rent_period: number;
 }

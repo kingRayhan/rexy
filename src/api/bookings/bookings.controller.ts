@@ -22,4 +22,15 @@ export class BookingsController {
       message: AppMessage.PRODUCT_BOOKED,
     });
   }
+
+  @Post('return/:id')
+  @Authenticated()
+  async return(@Body() payload: CreateBookingDto, @Req() req: AppRequest) {
+    const data = await this.bookingsService.returnBooking(payload, req.user);
+    return new AppResponse({
+      data,
+      statusCode: HttpStatus.CREATED,
+      message: AppMessage.PRODUCT_BOOKED,
+    });
+  }
 }
