@@ -8,6 +8,7 @@ import { AppMessage } from 'src/app/utils/messages.enum';
 import { toMongooseObjectId } from 'src/app/utils/mongoose-helper';
 import { ProductsService } from '../products/products.service';
 import { BOOKING_STATUS } from './contracts/booking-types.enum';
+import { BookingListQueryDto } from './dto/booking-list-query.dto';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { Booking } from './entities/booking.entity';
 
@@ -44,12 +45,47 @@ export class BookingsService {
     });
   }
 
-  // async findOne(id: string) {
-  //   return this.db.show({
-  //     find: { _id: toMongooseObjectId(id) },
-  //     population: 'product',
-  //   });
-  // }
+  /**
+   * Get a single booking by id
+   * @param id - string
+   * @param authenticatedUser - RequestUser
+   * @returns
+   */
+  async myBookingFindOne(id: string, authenticatedUser: RequestUser) {
+    return this.db.show({
+      find: {
+        _id: { $eq: toMongooseObjectId(id) },
+        user: { $eq: authenticatedUser.subscriber },
+      },
+      population: 'product',
+    });
+  }
+
+  /***
+   * Get all bookings for the authenticated user
+   */
+  async myBookings(
+    payload: BookingListQueryDto,
+    authenticatedUser: RequestUser,
+  ) {
+    const __find = {
+      user: { $eq: authenticatedUser.subscriber },
+    };
+
+    // when status is provided
+    if (payload.status) {
+      __find['status'] = { $eq: payload.status };
+    }
+    return this.db.list({
+      pagination: {
+        limit: payload.limit,
+        page: payload.page,
+      },
+      find: {
+        ...__find,
+      },
+    });
+  }
 
   returnBooking(payload: CreateBookingDto, authenticatedUser: RequestUser) {
     return this.db.update(
