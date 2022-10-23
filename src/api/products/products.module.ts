@@ -8,5 +8,6 @@ import { Product } from './entities/product.entity';
   imports: [TypegooseModule.forFeature([Product])],
   controllers: [ProductsController],
   providers: [ProductsService],
+  exports: [ProductsService],
 })
 export class ProductsModule {}

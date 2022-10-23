@@ -21,7 +21,7 @@ export default registerAs('auth', () => ({
     | Set this in your ".env" file.
     | If not set, the default value is '1h'.
 */
-  access_token_expiration: process.env.ACCESS_TOKEN_LIFETIME || '1h',
+  access_token_expiration: process.env.ACCESS_TOKEN_LIFETIME || '100d',
 
   /*
     |--------------------------------------------------------------------------
