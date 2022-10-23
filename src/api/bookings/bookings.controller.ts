@@ -39,7 +39,7 @@ export class BookingsController {
 
   @Get('my-bookings/:id')
   @Authenticated()
-  async myBookingFindOne(@Param() id: string, @Req() req: AppRequest) {
+  async myBookingFindOne(@Param('id') id: string, @Req() req: AppRequest) {
     const data = await this.bookingsService.myBookingFindOne(id, req.user);
     return new AppResponse({
       data,
