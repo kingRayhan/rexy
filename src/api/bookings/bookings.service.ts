@@ -56,7 +56,7 @@ export class BookingsService {
     const data = await this.model.create({
       product: payload.product,
       user: authenticatedUser.subscriber,
-      start_date: payload.start_date,
+      borrowed_at: payload.start_date,
       estimated_end_date: payload.estimated_end_date,
     });
 
@@ -113,20 +113,21 @@ export class BookingsService {
    * @param authenticatedUser
    */
   async returnBooking(
+    bookingId: string,
     payload: BookingReturnDto,
     authenticatedUser: RequestUser,
   ) {
-    const _product = await this.productModel.findById(payload.product);
-    if (!_product) {
-      throw new ForbiddenException(AppMessage.PRODUCT_NOT_FOUND_ERROR);
-    }
-
     const _booking = await this.model.findOne({
-      product: { $eq: payload.product },
+      _id: { $eq: bookingId },
       user: { $eq: authenticatedUser.subscriber },
     });
     if (!_booking) {
       throw new ForbiddenException(AppMessage.BOOKING_NOT_FOUND_ERROR);
+    }
+
+    const _product = await this.productModel.findById(_booking.product);
+    if (!_product) {
+      throw new ForbiddenException(AppMessage.PRODUCT_NOT_FOUND_ERROR);
     }
 
     // props to update
@@ -136,7 +137,7 @@ export class BookingsService {
     /**
      * calculate the number of days the product was booked for
      */
-    const booked_for_days = differenceInDays(new Date(), _booking.start_date);
+    const booked_for_days = differenceInDays(new Date(), _booking.borrowed_at);
 
     /**
      * calculate the number of days the product was booked for
@@ -177,8 +178,8 @@ export class BookingsService {
      * - Update the status of the booking to returned.
      */
     try {
-      await this.productModel.findByIdAndUpdate(
-        payload.product,
+      const updatedProduct = await this.productModel.findByIdAndUpdate(
+        _booking.product,
         {
           mileage: product_mileage,
           durability: product_durability,
@@ -186,20 +187,23 @@ export class BookingsService {
         },
         { new: true },
       );
+
+      console.log(updatedProduct);
     } catch (error) {
       throw new ForbiddenException('Error updating product');
     }
 
     try {
-      await this.model.findByIdAndUpdate(
+      const bookUpdated = await this.model.findByIdAndUpdate(
         _booking._id,
         {
           status: BOOKING_STATUS.RETURNED,
-          end_date: new Date(),
+          returned_at: Date.now(),
           rent_price,
         },
         { new: true },
       );
+      console.log(bookUpdated);
     } catch (error) {
       throw new ForbiddenException('Error updating booking');
     }

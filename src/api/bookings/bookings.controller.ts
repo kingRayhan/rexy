@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Query,
   Req,
 } from '@nestjs/common';
@@ -60,10 +61,18 @@ export class BookingsController {
     });
   }
 
-  @Post('return/:id')
+  @Put('return/:id')
   @Authenticated()
-  async return(@Body() payload: BookingReturnDto, @Req() req: AppRequest) {
-    const data = await this.bookingsService.returnBooking(payload, req.user);
+  async return(
+    @Body() payload: BookingReturnDto,
+    @Req() req: AppRequest,
+    @Param('id') bookingId: string,
+  ) {
+    const data = await this.bookingsService.returnBooking(
+      bookingId,
+      payload,
+      req.user,
+    );
     return new AppResponse({
       data,
       statusCode: HttpStatus.CREATED,

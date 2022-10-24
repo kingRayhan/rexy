@@ -14,6 +14,7 @@ import { TestDatabaseModule } from './shared/test-database/test-database.module'
 import { ProductsModule } from './api/products/products.module';
 import { FirebaseModule } from './shared/firebase/firebase.module';
 import { BookingsModule } from './api/bookings/bookings.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -48,6 +49,6 @@ import { BookingsModule } from './api/bookings/bookings.module';
     FirebaseModule,
     BookingsModule,
   ],
-  controllers: [AppTestApisController],
+  controllers: [AppTestApisController, AppController],
 })
 export class AppModule {}
