@@ -16,6 +16,7 @@ import { Authenticated } from '../auth/decorators/authenticated.decorator';
 import { BookingsService } from './bookings.service';
 import { BookingListQueryDto } from './dto/booking-list-query.dto';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { BookingReturnDto } from './dto/return-booking.dto';
 
 @Controller('bookings')
 @ApiTags('Bookings')
@@ -61,12 +62,12 @@ export class BookingsController {
 
   @Post('return/:id')
   @Authenticated()
-  async return(@Body() payload: CreateBookingDto, @Req() req: AppRequest) {
+  async return(@Body() payload: BookingReturnDto, @Req() req: AppRequest) {
     const data = await this.bookingsService.returnBooking(payload, req.user);
     return new AppResponse({
       data,
       statusCode: HttpStatus.CREATED,
-      message: AppMessage.PRODUCT_BOOKED,
+      message: AppMessage.BOOKING_RETURNED,
     });
   }
 }

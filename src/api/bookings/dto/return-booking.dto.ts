@@ -1,18 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
-export class CreateBookingDto {
+export class BookingReturnDto {
   @ApiProperty({ description: 'The id of the product' })
   @IsNotEmpty()
   product: string;
 
-  @ApiProperty({
-    description: 'Used mileage for this product if applicable',
-    required: false,
-  })
-  @IsOptional()
-  used_mileage?: number;
-
   @ApiProperty({ description: 'Need repair?', default: false, required: false })
+  @IsNotEmpty()
   need_repair: boolean;
 }

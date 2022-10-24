@@ -15,4 +15,9 @@ export enum AppMessage {
   PRODUCT_ALREADY_BOOKED_ERROR = 'You already have a booking for this product',
   BOOKED_ENTRY_FOUND = 'Booked entry found',
   MY_BOOKINGS = 'My bookings',
+  BOOKING_RETURNED = 'Booking returned',
+  BOOKING_NOT_FOUND_ERROR = 'Booking not found',
+
+  // products
+  PRODUCT_NOT_FOUND_ERROR = 'Product not found',
 }

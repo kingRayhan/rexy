@@ -1,15 +1,18 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ReturnModelType } from '@typegoose/typegoose';
-import { subDays } from 'date-fns';
+import { differenceInDays, subDays } from 'date-fns';
 import { InjectModel } from 'nestjs-typegoose';
 import { RequestUser } from 'src/app/contracts/RequestUser.interface';
 import { DatabaseRepository } from 'src/app/database/DatabaseRepository';
 import { AppMessage } from 'src/app/utils/messages.enum';
 import { toMongooseObjectId } from 'src/app/utils/mongoose-helper';
+import { Product } from '../products/entities/product.entity';
 import { ProductsService } from '../products/products.service';
 import { BOOKING_STATUS } from './contracts/booking-types.enum';
 import { BookingListQueryDto } from './dto/booking-list-query.dto';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { BookingReturnDto } from './dto/return-booking.dto';
 import { Booking } from './entities/booking.entity';
 
 @Injectable()
@@ -19,7 +22,9 @@ export class BookingsService {
   constructor(
     @InjectModel(Booking)
     private readonly model: ReturnModelType<typeof Booking>,
-    private readonly productsService: ProductsService,
+    @InjectModel(Product)
+    private readonly productModel: ReturnModelType<typeof Product>,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   /**
@@ -29,6 +34,12 @@ export class BookingsService {
    * @returns
    */
   async create(payload: CreateBookingDto, authenticatedUser: RequestUser) {
+    const _product = await this.productModel.findById(payload.product);
+
+    if (!_product) {
+      throw new ForbiddenException(AppMessage.PRODUCT_NOT_FOUND_ERROR);
+    }
+
     const productIsAlreadyBooked = await this.model.findOne({
       product: { $eq: payload.product },
       user: { $eq: authenticatedUser.subscriber },
@@ -37,12 +48,15 @@ export class BookingsService {
     if (productIsAlreadyBooked) {
       throw new ForbiddenException(AppMessage.PRODUCT_ALREADY_BOOKED_ERROR);
     }
-    return this.model.create({
+    const data = await this.model.create({
       product: payload.product,
       user: authenticatedUser.subscriber,
       start_date: payload.start_date,
       estimated_end_date: payload.estimated_end_date,
     });
+
+    this.eventEmitter.emit('booking.created', data);
+    return data;
   }
 
   /**
@@ -81,22 +95,107 @@ export class BookingsService {
         limit: payload.limit,
         page: payload.page,
       },
+      population: 'product',
       find: {
         ...__find,
       },
     });
   }
 
-  returnBooking(payload: CreateBookingDto, authenticatedUser: RequestUser) {
-    return this.db.update(
-      {
-        find: {
-          product: payload.product,
-          user: authenticatedUser.subscriber,
-          returned: false,
+  /**
+   * Return a product
+   * @param payload - BookingReturnDto
+   * @param authenticatedUser
+   */
+  async returnBooking(
+    payload: BookingReturnDto,
+    authenticatedUser: RequestUser,
+  ) {
+    const _product = await this.productModel.findById(payload.product);
+    if (!_product) {
+      throw new ForbiddenException(AppMessage.PRODUCT_NOT_FOUND_ERROR);
+    }
+
+    const _booking = await this.model.findOne({
+      product: { $eq: payload.product },
+    });
+    if (!_booking) {
+      throw new ForbiddenException(AppMessage.BOOKING_NOT_FOUND_ERROR);
+    }
+
+    // props to update
+    let product_mileage = _product.mileage;
+    let product_durability = _product.durability;
+
+    /**
+     * calculate the number of days the product was booked for
+     */
+    const booked_for_days = differenceInDays(new Date(), _booking.start_date);
+
+    /**
+     * calculate the number of days the product was booked for
+     */
+    let rent_price = _product.price * booked_for_days;
+
+    /**
+     * Apply the discount if the product was booked for more beyond the minimum days
+     */
+    if (booked_for_days > _product.minimum_rent_period) {
+      rent_price = rent_price - (_product.discount_rate * rent_price) / 100;
+    }
+
+    /**
+     * Update the mileage of the product
+     * - For the meter type estimation, you can assume that 10 miles will be taken every day.
+     */
+    if (_product.type === 'meter') {
+      product_mileage = product_mileage + 10 * booked_for_days;
+    }
+
+    /**
+     * Update the durability of the product
+     *
+     * - For the plain type, durability will be decreased 1 point per every day.
+     * - For the meter type, durability will be decreased 2 points per every day. (Assume that 10 miles will be taken every day.)
+     */
+    if (_product.type === 'meter') {
+      product_durability = product_durability - 2 * booked_for_days;
+    } else {
+      product_durability = product_durability - booked_for_days;
+    }
+
+    /**
+     * Update the product
+     * - Update the mileage and durability of the product.
+     * - Update the status of the product to available.
+     * - Update the status of the booking to returned.
+     */
+    try {
+      await this.productModel.findByIdAndUpdate(
+        payload.product,
+        {
+          mileage: product_mileage,
+          durability: product_durability,
+          availability: true,
         },
-      },
-      { returned: true },
-    );
+        { new: true },
+      );
+    } catch (error) {
+      throw new ForbiddenException('Error updating product');
+    }
+
+    try {
+      await this.model.findByIdAndUpdate(
+        _booking._id,
+        {
+          status: BOOKING_STATUS.RETURNED,
+          end_date: new Date(),
+          rent_price,
+        },
+        { new: true },
+      );
+    } catch (error) {
+      throw new ForbiddenException('Error updating booking');
+    }
   }
 }

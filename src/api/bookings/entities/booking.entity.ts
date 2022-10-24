@@ -26,7 +26,7 @@ export class Booking extends TimeStamps {
   status?: BOOKING_STATUS;
 
   @prop({ required: false, default: 0 })
-  price?: number;
+  rent_price?: number;
 
   @prop({ required: true })
   start_date: Date;
@@ -36,4 +36,7 @@ export class Booking extends TimeStamps {
 
   @prop({ required: false })
   end_date?: Date;
+
+  @prop({ required: false })
+  returned_at?: Date;
 }
