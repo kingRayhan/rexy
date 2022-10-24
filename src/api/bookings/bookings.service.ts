@@ -40,6 +40,11 @@ export class BookingsService {
       throw new ForbiddenException(AppMessage.PRODUCT_NOT_FOUND_ERROR);
     }
 
+    // check if the product is available
+    if (!_product.availability) {
+      throw new ForbiddenException(AppMessage.PRODUCT_NOT_AVAILABLE_ERROR);
+    }
+
     const productIsAlreadyBooked = await this.model.findOne({
       product: { $eq: payload.product },
       user: { $eq: authenticatedUser.subscriber },
@@ -118,13 +123,14 @@ export class BookingsService {
 
     const _booking = await this.model.findOne({
       product: { $eq: payload.product },
+      user: { $eq: authenticatedUser.subscriber },
     });
     if (!_booking) {
       throw new ForbiddenException(AppMessage.BOOKING_NOT_FOUND_ERROR);
     }
 
     // props to update
-    let product_mileage = _product.mileage;
+    let product_mileage = _product.mileage || null;
     let product_durability = _product.durability;
 
     /**
@@ -148,7 +154,7 @@ export class BookingsService {
      * Update the mileage of the product
      * - For the meter type estimation, you can assume that 10 miles will be taken every day.
      */
-    if (_product.type === 'meter') {
+    if (product_mileage && _product.type === 'meter') {
       product_mileage = product_mileage + 10 * booked_for_days;
     }
 

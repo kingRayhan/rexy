@@ -20,4 +20,5 @@ export enum AppMessage {
 
   // products
   PRODUCT_NOT_FOUND_ERROR = 'Product not found',
+  PRODUCT_NOT_AVAILABLE_ERROR = 'Product not available',
 }
