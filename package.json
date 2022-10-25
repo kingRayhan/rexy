@@ -1,7 +1,7 @@
 {
   "name": "rexy",
   "version": "0.0.1",
-  "description": "",
+  "description": "Rexy is a nextjs boilerplate where you will find all sorts of standard functionality like authentication, role based authorization, and notification with proper testing.",
   "author": {
     "name": "KingRayhan",
     "email": "rayhan.dev.bd@gmail.com",
