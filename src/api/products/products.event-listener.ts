@@ -2,8 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
-import { Booking } from '../bookings/entities/booking.entity';
 import { Product } from './entities/product.entity';
+import { Booking } from "@/bookings/entities/booking.entity";
+
+
 
 @Injectable()
 export class ProductEventListener {

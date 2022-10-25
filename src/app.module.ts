@@ -1,20 +1,19 @@
-import { AuthModule } from './api/auth/auth.module';
-import { RoleModule } from './api/role/role.module';
-import { SessionModule } from './api/session/session.module';
-import { UserModule } from './api/user/user.module';
-import configs from './app/config';
-import { MailModule } from './shared/mail/mail.module';
-import { NotificationModule } from './shared/notification/notification.module';
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { TypegooseModule } from 'nestjs-typegoose';
-import { AppTestApisController } from './app.test-apis';
-import { TestDatabaseModule } from './shared/test-database/test-database.module';
-import { ProductsModule } from './api/products/products.module';
-import { FirebaseModule } from './shared/firebase/firebase.module';
-import { BookingsModule } from './api/bookings/bookings.module';
-import { AppController } from './app.controller';
+import { AuthModule } from "./api/auth/auth.module";
+import { RoleModule } from "./api/role/role.module";
+import { SessionModule } from "./api/session/session.module";
+import { UserModule } from "./api/user/user.module";
+import configs from "./app/config";
+import { MailModule } from "./shared/mail/mail.module";
+import { NotificationModule } from "./shared/notification/notification.module";
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { EventEmitterModule } from "@nestjs/event-emitter";
+import { TypegooseModule } from "nestjs-typegoose";
+import { AppTestApisController } from "./app.test-apis";
+import { TestDatabaseModule } from "./shared/test-database/test-database.module";
+import { FirebaseModule } from "./shared/firebase/firebase.module";
+import { AppController } from "./app.controller";
+import { ProductsModule } from "@/api/products/products.module";
 
 @Module({
   imports: [
@@ -24,14 +23,14 @@ import { AppController } from './app.controller';
     ConfigModule.forRoot({
       isGlobal: true,
       load: configs,
-      envFilePath: ['.env.prod', '.env.dev', '.env'],
+      envFilePath: [".env.prod", ".env.dev", ".env"]
     }),
     TypegooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => ({
-        uri: config.get('database.url'),
-      }),
+        uri: config.get("database.url")
+      })
     }),
     EventEmitterModule.forRoot(),
 
@@ -45,10 +44,11 @@ import { AppController } from './app.controller';
     NotificationModule,
     AuthModule,
     TestDatabaseModule,
-    ProductsModule,
     FirebaseModule,
-    BookingsModule,
+    //  ----
+    ProductsModule
   ],
-  controllers: [AppTestApisController, AppController],
+  controllers: [AppTestApisController, AppController]
 })
-export class AppModule {}
+export class AppModule {
+}

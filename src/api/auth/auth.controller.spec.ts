@@ -4,18 +4,19 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { getModelToken } from 'nestjs-typegoose';
 import * as request from 'supertest';
-import validationOptions from '../../app/utils/validation-options';
-import configs from '../../app/config';
-import { AppMessage } from '../../app/utils/messages.enum';
-import { TestDatabaseModule } from '../../shared/test-database/test-database.module';
-import { SessionModule } from '../session/session.module';
-import { User } from '../user/entities/user.entity';
-import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { PassportJWTAccessTokenStrategy } from './passport-stategies/jwt-at';
 import { PassportJWTRefreshTokenStrategy } from './passport-stategies/jwt-rt';
+import { User } from "@/api/user/entities/user.entity";
+import { TestDatabaseModule } from "@/shared/test-database/test-database.module";
+import { UserModule } from "@/api/user/user.module";
+import { SessionModule } from "@/api/session/session.module";
+import validationOptions from "@/app/utils/validation-options";
+import { AppMessage } from "@/app/utils/messages.enum";
+import configs from '@/app/config/index';
+import { FirebaseModule } from "@/shared/firebase/firebase.module";
 
 describe('AuthController', () => {
   let app: INestApplication;
@@ -32,6 +33,7 @@ describe('AuthController', () => {
         UserModule,
         SessionModule,
         PassportModule,
+        FirebaseModule
       ],
       controllers: [AuthController],
       providers: [
@@ -172,7 +174,7 @@ describe('AuthController', () => {
 
     it('Login using email', async () => {
       await userModel.deleteMany({});
-      userModel.create({
+      await userModel.create({
         name: 'King Rayhan',
         username: 'rayhan',
         email: 'example@example.com',
@@ -191,7 +193,7 @@ describe('AuthController', () => {
 
     it('⛔ Throw 403: For valid username & invalid password', async () => {
       await userModel.deleteMany({});
-      userModel.create({
+      await userModel.create({
         name: 'King Rayhan',
         username: 'rayhan',
         email: 'example@example.com',
@@ -209,7 +211,7 @@ describe('AuthController', () => {
 
     it('⛔ Throw 403: For invalid username & valid password', async () => {
       await userModel.deleteMany({});
-      userModel.create({
+      await userModel.create({
         name: 'King Rayhan',
         username: 'rayhan',
         email: 'example@example.com',
@@ -308,7 +310,7 @@ describe('AuthController', () => {
 
     it('⛔ throw 401: After refreshing using a refresh token then that token will not work again', async () => {
       await userModel.deleteMany({});
-      userModel.create({
+      await userModel.create({
         name: 'King Rayhan',
         username: 'rayhan',
         email: 'example@example.com',

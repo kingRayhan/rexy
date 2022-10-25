@@ -13,9 +13,9 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { ProductListQuetyDto } from './dto/product-list-query.dto';
-import AppResponse from 'src/app/utils/app-response.class';
-import { Authenticated } from '../auth/decorators/authenticated.decorator';
+import { ProductListQueryDto } from './dto/product-list-query.dto';
+import { Authenticated } from "@/api/auth/decorators/authenticated.decorator";
+import AppResponse from "@/app/utils/app-response.class";
 
 @Controller('products')
 @ApiTags('Products')
@@ -40,7 +40,7 @@ export class ProductsController {
   }
 
   @Get()
-  async findAll(@Query() query: ProductListQuetyDto) {
+  async findAll(@Query() query: ProductListQueryDto) {
     const data = await this.productsService.findAll(query);
     return new AppResponse({
       data,

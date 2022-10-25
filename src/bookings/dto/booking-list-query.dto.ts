@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional } from 'class-validator';
-import { CommonPaginationDTO } from 'src/app/contracts/common-pagination-dto';
-import { BOOKING_STATUS } from '../contracts/booking-types.enum';
+import { CommonPaginationDTO } from "@/app/contracts/common-pagination-dto";
+import { BOOKING_STATUS } from "@/bookings/contracts/booking-types.enum";
 
 export class BookingListQueryDto extends CommonPaginationDTO {
   @ApiProperty({

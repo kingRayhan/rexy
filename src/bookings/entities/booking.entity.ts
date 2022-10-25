@@ -1,8 +1,8 @@
-import { prop, Ref } from '@typegoose/typegoose';
-import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
-import { Product } from 'src/api/products/entities/product.entity';
-import { User } from 'src/api/user/entities/user.entity';
-import { BOOKING_STATUS } from '../contracts/booking-types.enum';
+import { prop, Ref } from "@typegoose/typegoose";
+import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
+import { BOOKING_STATUS } from "../contracts/booking-types.enum";
+import { User } from "@/api/user/entities/user.entity";
+import { Product } from "@/api/products/entities/product.entity";
 
 export class Booking extends TimeStamps {
   _id?: string;
