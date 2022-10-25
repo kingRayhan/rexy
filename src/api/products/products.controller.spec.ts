@@ -2,22 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsController } from './products.controller';
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
-import { ConfigModule } from '@nestjs/config';
-import configs from '@/app/config';
-import { TestDatabaseModule } from '@/shared/test-database/test-database.module';
 import { getModelToken, TypegooseModule } from 'nestjs-typegoose';
 import validationOptions from '@/app/utils/validation-options';
 import { Product } from '@/api/products/entities/product.entity';
 import { ProductsService } from '@/api/products/products.service';
 import { ProductEventListener } from '@/api/products/products.event-listener';
 import * as request from 'supertest';
-import { PassportModule } from '@nestjs/passport';
-import { AuthService } from '@/api/auth/auth.service';
-import { PassportJWTAccessTokenStrategy } from '@/api/auth/passport-stategies/jwt-at';
-import { PassportJWTRefreshTokenStrategy } from '@/api/auth/passport-stategies/jwt-rt';
-import { UserModule } from '@/api/user/user.module';
-import { SessionModule } from '@/api/session/session.module';
-import { FirebaseModule } from '@/shared/firebase/firebase.module';
+import { TestScaffoldModule } from '@/shared/test-scaffold/test-scaffold.module';
+import { TestScaffoldService } from '@/shared/test-scaffold/test-scaffold.service';
 
 const demoProducts: Product[] = [
   {
@@ -91,34 +83,21 @@ describe('ProductsController', () => {
   let app: INestApplication;
   let controller: ProductsController;
   let productModel: ReturnModelType<typeof Product>;
+  let testScaffoldService: TestScaffoldService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        ConfigModule.forRoot({
-          load: configs,
-        }),
-        TestDatabaseModule,
+        TestScaffoldModule,
         TypegooseModule.forFeature([Product]),
-        // --- For authentication
-        UserModule,
-        SessionModule,
-        PassportModule,
-        FirebaseModule,
         // ---
       ],
       controllers: [ProductsController],
-      providers: [
-        ProductsService,
-        ProductEventListener,
-
-        // --- For authentication
-        AuthService,
-        PassportJWTAccessTokenStrategy,
-        PassportJWTRefreshTokenStrategy,
-      ],
+      providers: [ProductsService, ProductEventListener],
     }).compile();
+
     controller = module.get<ProductsController>(ProductsController);
+    testScaffoldService = module.get<TestScaffoldService>(TestScaffoldService);
     productModel = module.get<ReturnModelType<typeof Product>>(
       getModelToken('Product'),
     );
@@ -149,12 +128,22 @@ describe('ProductsController', () => {
   });
 
   describe('POST /products', () => {
-    it('⛔ Throw 401: For unauthenticated request', async () => {
+    it('Create a product with token', async () => {
       const response = await request(app.getHttpServer())
         .post('/products')
         .set('Authorization', `Bearer --`);
       expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
       expect(response.body).toHaveProperty('message');
+    });
+
+    it('⛔ Throw 401: For unauthenticated request', async () => {
+      const user = await testScaffoldService.createTestUser();
+
+      // const response = await request(app.getHttpServer())
+      //   .post('/products')
+      //   .set('Authorization', `Bearer --`);
+      // expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
+      // expect(response.body).toHaveProperty('message');
     });
   });
 });
