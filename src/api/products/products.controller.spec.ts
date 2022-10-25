@@ -45,12 +45,11 @@ describe("ProductsController", () => {
     expect(controller).toBeDefined();
   });
 
-  describe('POST /products', () => {
-    it('should create a product', async () => {
-
+  describe("GET /products", () => {
+    it("should create a product", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/products")
+        .send();
     });
-    // const response = await request(app.getHttpServer())
-    //   .post('/products')
-    //   .send();
   });
 });
