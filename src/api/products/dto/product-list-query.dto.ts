@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional } from 'class-validator';
-import { CommonPaginationDTO } from 'src/app/contracts/common-pagination-dto';
+import { CommonPaginationDTO } from "@/app/contracts/common-pagination-dto";
 
-export class ProductListQuetyDto extends CommonPaginationDTO {
+export class ProductListQueryDto extends CommonPaginationDTO {
   @ApiProperty({
     required: false,
     enum: [

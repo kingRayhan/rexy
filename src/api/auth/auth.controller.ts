@@ -1,25 +1,16 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Request, Response } from 'express';
-import AppResponse from '../../app/utils/app-response.class';
-import { AppMessage } from '../../app/utils/messages.enum';
-import { SessionService } from '../session/session.service';
-import { AuthService } from './auth.service';
-import { AuthStrategy } from './contracts/AuthStategy.enum';
-import { Authenticated } from './decorators/authenticated.decorator';
-import { FirebaseLoginDTO } from './dto/firebase-login.dto';
-import { AuthLoginDTO } from './dto/login.dto';
-import { AuthRegisterDTO } from './dto/register.dto';
+import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Request, Response } from "express";
+import { AuthService } from "./auth.service";
+import { AuthStrategy } from "./contracts/AuthStategy.enum";
+import { Authenticated } from "./decorators/authenticated.decorator";
+import { FirebaseLoginDTO } from "./dto/firebase-login.dto";
+import { AuthLoginDTO } from "./dto/login.dto";
+import { AuthRegisterDTO } from "./dto/register.dto";
+import { AppMessage } from "@/app/utils/messages.enum";
+import { SessionService } from "@/api/session/session.service";
+import AppResponse from "@/app/utils/app-response.class";
 
 @Controller('auth')
 @ApiTags('Authentication')
@@ -46,7 +37,7 @@ export class AuthController {
     @Body() payload: AuthLoginDTO,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const user = await this.authService.login(payload);
+    const user = await this.authService.verifyCredential(payload);
     const token = await this.sessionService.claimToken(user._id);
 
     if (payload.setToCookie) {

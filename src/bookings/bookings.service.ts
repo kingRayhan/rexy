@@ -3,16 +3,16 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { differenceInDays } from 'date-fns';
 import { InjectModel } from 'nestjs-typegoose';
-import { RequestUser } from 'src/app/contracts/RequestUser.interface';
-import { DatabaseRepository } from 'src/app/database/DatabaseRepository';
-import { AppMessage } from 'src/app/utils/messages.enum';
-import { toMongooseObjectId } from 'src/app/utils/mongoose-helper';
-import { Product } from '../products/entities/product.entity';
 import { BOOKING_STATUS } from './contracts/booking-types.enum';
 import { BookingListQueryDto } from './dto/booking-list-query.dto';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { BookingReturnDto } from './dto/return-booking.dto';
 import { Booking } from './entities/booking.entity';
+import { DatabaseRepository } from "@/app/database/DatabaseRepository";
+import { RequestUser } from "@/app/contracts/RequestUser.interface";
+import { AppMessage } from "@/app/utils/messages.enum";
+import { toMongooseObjectId } from "@/app/utils/mongoose-helper";
+import { Product } from "@/api/products/entities/product.entity";
 
 @Injectable()
 export class BookingsService {
@@ -108,6 +108,7 @@ export class BookingsService {
 
   /**
    * Return a product
+   * @param bookingId
    * @param payload - BookingReturnDto
    * @param authenticatedUser
    */

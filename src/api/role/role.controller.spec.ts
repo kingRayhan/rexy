@@ -1,16 +1,16 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { Test, TestingModule } from '@nestjs/testing';
-import { TypegooseModule } from 'nestjs-typegoose';
-import configs from '../../app/config';
-import validationOptions from '../../app/utils/validation-options';
-import { TestDatabaseModule } from '../../shared/test-database/test-database.module';
-import { User } from '../user/entities/user.entity';
-import { Role } from './entities/role.entity';
-import { RoleController } from './role.controller';
-import { RoleService } from './role.service';
+import { INestApplication, ValidationPipe } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { Test, TestingModule } from "@nestjs/testing";
+import { TypegooseModule } from "nestjs-typegoose";
+import configs from "../../app/config";
+import { Role } from "./entities/role.entity";
+import { RoleController } from "./role.controller";
+import { RoleService } from "./role.service";
+import validationOptions from "@/app/utils/validation-options";
+import { TestDatabaseModule } from "@/shared/test-database/test-database.module";
+import { User } from "@/api/user/entities/user.entity";
 
-describe('RoleController', () => {
+describe("RoleController", () => {
   let app: INestApplication;
   let controller: RoleController;
 
@@ -18,13 +18,13 @@ describe('RoleController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
-          load: configs,
+          load: configs
         }),
         TestDatabaseModule,
-        TypegooseModule.forFeature([Role, User]),
+        TypegooseModule.forFeature([Role, User])
       ],
       controllers: [RoleController],
-      providers: [RoleService],
+      providers: [RoleService]
     }).compile();
 
     controller = module.get<RoleController>(RoleController);
@@ -34,7 +34,7 @@ describe('RoleController', () => {
     await app.init();
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 });

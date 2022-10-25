@@ -3,11 +3,11 @@ import { ReturnModelType } from '@typegoose/typegoose';
 import { FilterQuery } from 'mongoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { union } from 'underscore';
-import { User } from '../user/entities/user.entity';
 import { Permission } from './contracts/permission.enum';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { Role } from './entities/role.entity';
+import { User } from "@/api/user/entities/user.entity";
 
 @Injectable()
 export class RoleService {
