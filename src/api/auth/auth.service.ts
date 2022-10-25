@@ -1,19 +1,20 @@
-import { AppMessage } from '../../app/utils/messages.enum';
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { SessionService } from '../session/session.service';
-import { UserService } from '../user/user.service';
-import { AuthLoginDTO } from './dto/login.dto';
-import { AuthRegisterDTO } from './dto/register.dto';
-import { FirebaseService } from 'src/shared/firebase/firebase.service';
-import { User } from '../user/entities/user.entity';
+import { ForbiddenException, Injectable } from "@nestjs/common";
+import { SessionService } from "../session/session.service";
+import { UserService } from "../user/user.service";
+import { AuthLoginDTO } from "./dto/login.dto";
+import { AuthRegisterDTO } from "./dto/register.dto";
+import { AppMessage } from "@/app/utils/messages.enum";
+import { User } from "@/api/user/entities/user.entity";
+import { FirebaseService } from "@/shared/firebase/firebase.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly sessionService: SessionService,
-    private readonly firebaseService: FirebaseService,
-  ) {}
+    private readonly firebaseService: FirebaseService
+  ) {
+  }
 
   public async register(payload: AuthRegisterDTO) {
     payload.email = payload.email.toLowerCase();
@@ -23,7 +24,7 @@ export class AuthService {
      * Check if user exists with the same username
      */
     const userNameExists = await this.userService.getUser({
-      username: payload.username,
+      username: payload.username
     });
     if (Boolean(userNameExists))
       throw new ForbiddenException(AppMessage.USERNAME_ALREADY_EXISTS);
@@ -32,36 +33,35 @@ export class AuthService {
      * Check if user exists with the same email
      */
     const emailExists = await this.userService.getUser({
-      email: payload.email,
+      email: payload.email
     });
     if (Boolean(emailExists))
       throw new ForbiddenException(AppMessage.EMAIL_ALREADY_EXISTS);
 
-    const user = await this.userService.create({
+    return await this.userService.create({
       ...payload,
-      password: payload.password,
+      password: payload.password
     });
-    return user;
   }
 
   /**
-   * Login a user
+   * User credentials check
    * @param payload AuthLoginDTO
    * @returns
    */
-  public async login(payload: AuthLoginDTO): Promise<User> {
+  public async validateCredential(payload: AuthLoginDTO): Promise<User> {
     // Is Email or Username
     const _user = this.__isEmail(payload.user);
 
     const fetchUser = await this.userService.getUser({
-      [_user ? 'email' : 'username']: payload.user,
+      [_user ? "email" : "username"]: payload.user
     });
     if (!Boolean(fetchUser))
       throw new ForbiddenException(AppMessage.INVALID_CREDENTIALS);
 
     const isPasswordValid = this.userService.comparePassword(
       fetchUser,
-      payload.password,
+      payload.password
     );
     if (!Boolean(isPasswordValid))
       throw new ForbiddenException(AppMessage.INVALID_CREDENTIALS);
@@ -104,10 +104,10 @@ export class AuthService {
       _user = await this.userService.create({
         name: decodedToken.name,
         email: decodedToken.email,
-        username: decodedToken.email.split('@')[0],
+        username: decodedToken.email.split("@")[0],
         password: Date.now().toString(),
         avatar: decodedToken.picture,
-        emailConfirmed: true,
+        emailConfirmed: true
       });
     }
 
@@ -123,11 +123,11 @@ export class AuthService {
   /**
    * Check if the string is an email
    * @param email string - email to check
-   * @returns true if email, false if username
+   * @returns true if email is valid
    */
   private __isEmail = (email: string) => {
     return email.match(
-      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
   };
 }

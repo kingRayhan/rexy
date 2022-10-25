@@ -1,4 +1,0 @@
-export enum BOOKING_STATUS {
-  CONSUMING = 'CONSUMING',
-  RETURNED = 'RETURNED',
-}

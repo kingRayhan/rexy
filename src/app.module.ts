@@ -11,9 +11,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypegooseModule } from 'nestjs-typegoose';
 import { AppTestApisController } from './app.test-apis';
 import { TestDatabaseModule } from './shared/test-database/test-database.module';
-import { ProductsModule } from './api/products/products.module';
 import { FirebaseModule } from './shared/firebase/firebase.module';
-import { BookingsModule } from './api/bookings/bookings.module';
 import { AppController } from './app.controller';
 
 @Module({
@@ -45,9 +43,7 @@ import { AppController } from './app.controller';
     NotificationModule,
     AuthModule,
     TestDatabaseModule,
-    ProductsModule,
     FirebaseModule,
-    BookingsModule,
   ],
   controllers: [AppTestApisController, AppController],
 })
