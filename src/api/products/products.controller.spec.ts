@@ -11,6 +11,13 @@ import { Product } from '@/api/products/entities/product.entity';
 import { ProductsService } from '@/api/products/products.service';
 import { ProductEventListener } from '@/api/products/products.event-listener';
 import * as request from 'supertest';
+import { PassportModule } from '@nestjs/passport';
+import { AuthService } from '@/api/auth/auth.service';
+import { PassportJWTAccessTokenStrategy } from '@/api/auth/passport-stategies/jwt-at';
+import { PassportJWTRefreshTokenStrategy } from '@/api/auth/passport-stategies/jwt-rt';
+import { UserModule } from '@/api/user/user.module';
+import { SessionModule } from '@/api/session/session.module';
+import { FirebaseModule } from '@/shared/firebase/firebase.module';
 
 const demoProducts: Product[] = [
   {
@@ -93,10 +100,23 @@ describe('ProductsController', () => {
         }),
         TestDatabaseModule,
         TypegooseModule.forFeature([Product]),
+        // --- For authentication
+        UserModule,
+        SessionModule,
+        PassportModule,
+        FirebaseModule,
         // ---
       ],
       controllers: [ProductsController],
-      providers: [ProductsService, ProductEventListener],
+      providers: [
+        ProductsService,
+        ProductEventListener,
+
+        // --- For authentication
+        AuthService,
+        PassportJWTAccessTokenStrategy,
+        PassportJWTRefreshTokenStrategy,
+      ],
     }).compile();
     controller = module.get<ProductsController>(ProductsController);
     productModel = module.get<ReturnModelType<typeof Product>>(
@@ -130,8 +150,9 @@ describe('ProductsController', () => {
 
   describe('POST /products', () => {
     it('⛔ Throw 401: For unauthenticated request', async () => {
-      const response = await request(app.getHttpServer()).post('/products');
-
+      const response = await request(app.getHttpServer())
+        .post('/products')
+        .set('Authorization', `Bearer --`);
       expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
       expect(response.body).toHaveProperty('message');
     });
