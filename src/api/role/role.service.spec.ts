@@ -3,11 +3,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { getModelToken, TypegooseModule } from 'nestjs-typegoose';
 import configs from '../../app/config';
-import { TestDatabaseModule } from '../../shared/test-database/test-database.module';
-import { User } from '../user/entities/user.entity';
 import { Permission } from './contracts/permission.enum';
 import { Role } from './entities/role.entity';
 import { RoleService } from './role.service';
+import { TestDatabaseModule } from "@/shared/test-database/test-database.module";
+import { User } from "@/api/user/entities/user.entity";
 
 describe('RoleService', () => {
   let service: RoleService;
@@ -40,7 +40,7 @@ describe('RoleService', () => {
     await userModel.deleteMany({});
   });
 
-  describe('RoleService.create', () => {
+  describe("RoleService.create", () => {
     it('Should create a new role', async () => {
       const savedRole = await service.create({
         name: 'role-name',
