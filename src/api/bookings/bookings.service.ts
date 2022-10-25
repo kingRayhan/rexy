@@ -1,14 +1,13 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ReturnModelType } from '@typegoose/typegoose';
-import { differenceInDays, subDays } from 'date-fns';
+import { differenceInDays } from 'date-fns';
 import { InjectModel } from 'nestjs-typegoose';
 import { RequestUser } from 'src/app/contracts/RequestUser.interface';
 import { DatabaseRepository } from 'src/app/database/DatabaseRepository';
 import { AppMessage } from 'src/app/utils/messages.enum';
 import { toMongooseObjectId } from 'src/app/utils/mongoose-helper';
 import { Product } from '../products/entities/product.entity';
-import { ProductsService } from '../products/products.service';
 import { BOOKING_STATUS } from './contracts/booking-types.enum';
 import { BookingListQueryDto } from './dto/booking-list-query.dto';
 import { CreateBookingDto } from './dto/create-booking.dto';
