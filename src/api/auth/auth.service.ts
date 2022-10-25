@@ -49,7 +49,7 @@ export class AuthService {
    * @param payload AuthLoginDTO
    * @returns
    */
-  public async validateCredential(payload: AuthLoginDTO): Promise<User> {
+  public async verifyCredential(payload: AuthLoginDTO): Promise<User> {
     // Is Email or Username
     const _user = this.__isEmail(payload.user);
 

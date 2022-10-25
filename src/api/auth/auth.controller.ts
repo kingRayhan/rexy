@@ -37,7 +37,7 @@ export class AuthController {
     @Body() payload: AuthLoginDTO,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const user = await this.authService.validateCredential(payload);
+    const user = await this.authService.verifyCredential(payload);
     const token = await this.sessionService.claimToken(user._id);
 
     if (payload.setToCookie) {
