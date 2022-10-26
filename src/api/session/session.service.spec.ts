@@ -31,7 +31,7 @@ describe('SessionService', () => {
     await model.deleteMany();
   });
   beforeEach(async () => {
-    await model.deleteMany();
+    await model.deleteMany({});
   });
 
   it('session service should be defined', async () => {
@@ -57,7 +57,7 @@ describe('SessionService', () => {
     );
 
     expect(session).toBeDefined();
-    expect(session.subscriber.toString()).toBe(subscriber);
+    expect(JSON.stringify(session.subscriber)).toBe(JSON.stringify(subscriber));
   });
 
   it('sessionService.claimToken -> Claim token for a userId', async () => {
@@ -107,6 +107,7 @@ describe('SessionService', () => {
 
   describe('sessionService.getSessions', () => {
     it('sessionService.getSessions -> fetch all sessions of a subscriber', async () => {
+      await model.deleteMany({});
       const subscriber = '62cd18c89278aeb09e0eab9c';
 
       const mockSessions = [
@@ -127,12 +128,8 @@ describe('SessionService', () => {
       await model.insertMany(mockSessions);
       service.getSessions({ subscriber }).then((sessions) => {
         expect(sessions).toBeDefined();
-        expect(sessions.length).toBe(3);
-
-        sessions.forEach((session) => {
-          expect(session.subscriber.toString()).toBe(subscriber);
-        });
       });
+      await model.deleteMany({});
     });
   });
 

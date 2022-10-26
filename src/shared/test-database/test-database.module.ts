@@ -8,7 +8,7 @@ import { TypegooseModule } from 'nestjs-typegoose';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => {
-        return { uri: config.get('database.testdb_url') };
+        return { uri: config.get('database.test_url') };
       },
     }),
   ],
