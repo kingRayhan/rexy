@@ -49,3 +49,11 @@ jobs:
         run: npm run test -- -t AuthController --verbose
         env:
           CI: true
+      - name: 🧪 RoleController - Role related endpoints
+        run: npm run test -- -t RoleController --verbose
+        env:
+          CI: true
+      - name: 🧪 RoleService - Role related endpoints
+        run: npm run test -- -t RoleService --verbose
+        env:
+          CI: true
