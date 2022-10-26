@@ -1,29 +1,24 @@
-import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { getModelToken, TypegooseModule } from 'nestjs-typegoose';
-import configs from '../../app/config';
-import { TestDatabaseModule } from '../../shared/test-database/test-database.module';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
+import { TestScaffoldService } from '@/shared/test-scaffold/test-scaffold.service';
+import { TestScaffoldModule } from '@/shared/test-scaffold/test-scaffold.module';
 
 describe('UserService', () => {
   let service: UserService;
   let model: ReturnModelType<typeof User>;
+  let testScaffoldService: TestScaffoldService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot({
-          load: configs,
-        }),
-        TestDatabaseModule,
-        TypegooseModule.forFeature([User]),
-      ],
+      imports: [TestScaffoldModule, TypegooseModule.forFeature([User])],
       providers: [UserService],
     }).compile();
 
     service = module.get<UserService>(UserService);
+    testScaffoldService = module.get<TestScaffoldService>(TestScaffoldService);
     model = module.get<ReturnModelType<typeof User>>(getModelToken('User'));
     await model.deleteMany();
   });
@@ -42,7 +37,6 @@ describe('UserService', () => {
 
   describe('userService.create', () => {
     it('userService.create -> Create a new user', async () => {
-      await model.deleteMany({});
       const userData = {
         name: 'John Doe',
         username: 'johndoe',
@@ -70,13 +64,14 @@ describe('UserService', () => {
     });
 
     it('⛔ throw error for duplicate username', async () => {
-      await model.deleteMany({});
+      // Previously created user with username: johndoe
       await model.create({
         username: 'johndoe',
         email: 'example@example.com',
         password: '123456',
       });
 
+      // Try to create a new user with same username
       await expect(
         service.create({
           username: 'johndoe',
@@ -87,13 +82,14 @@ describe('UserService', () => {
     });
 
     it('⛔ throw error for duplicate email', async () => {
-      await model.deleteMany({});
+      // Previously created user with email: 'example@example.com'
       await model.create({
         username: 'johndoe',
         email: 'example@example.com',
         password: '123456',
       });
 
+      // Try to create a new user with same email
       await expect(
         service.create({
           username: 'johndoe1',
@@ -106,38 +102,21 @@ describe('UserService', () => {
 
   describe('userService.getUser', () => {
     it('fetch user using _id', async () => {
-      await model.deleteMany({});
-      const user = {
-        name: 'Nibbi',
-        username: 'nibbi',
-        email: 'nibbi@gmail.com',
-        password: '123456',
-      };
-      const saved = await model.create(user);
+      const _user = await testScaffoldService.createTestUser();
 
-      service.getUser({ _id: saved._id }).then((user) => {
+      service.getUser({ _id: _user._id }).then((user) => {
         expect(user).toBeDefined();
-        expect(user.name).toBe(user.name);
-        expect(user.username).toBe(user.username);
-        expect(user.email).toBe(user.email);
+        expect(user.username).toBe(_user.username);
+        expect(user.email).toBe(_user.email);
       });
     });
 
     it('fetch user using username', async () => {
-      await model.deleteMany({});
-      const user = {
-        name: 'orchie',
-        username: 'orchie',
-        email: 'orchie@orchie.com',
-        password: '123456',
-      };
-      const saved = await model.create(user);
-
-      service.getUser({ username: saved.username }).then((user) => {
+      const _user = await testScaffoldService.createTestUser();
+      service.getUser({ username: _user.username }).then((user) => {
         expect(user).toBeDefined();
-        expect(user.name).toBe(user.name);
-        expect(user.username).toBe(user.username);
-        expect(user.email).toBe(user.email);
+        expect(user.username).toBe(_user.username);
+        expect(user.email).toBe(_user.email);
       });
     });
 
@@ -151,35 +130,21 @@ describe('UserService', () => {
 
   describe('userService.delete', () => {
     it('Delete a user using username', async () => {
-      await model.deleteMany({});
-      const user = {
-        name: 'Nibbi',
-        username: 'nibbi',
-        email: 'nibbi@nibbi.com',
-        password: '123456',
-      };
-      const saved = await model.create(user);
-
-      service.delete({ username: saved.username }).then((deleted) => {
+      const _test_user = await testScaffoldService.createTestUser();
+      service.delete({ username: _test_user.username }).then((deleted) => {
         expect(deleted.acknowledged).toBe(true);
         expect(deleted.deletedCount).toBe(1);
       });
     });
+
     it('Delete a user using email', async () => {
-      await model.deleteMany({});
-      const user = {
-        name: 'nishu',
-        username: 'nishu',
-        email: 'nishu@nishu.com',
-        password: '123456',
-      };
-      const saved = await model.create(user);
-
-      service.delete({ email: saved.email }).then((deleted) => {
+      const _test_user = await testScaffoldService.createTestUser();
+      service.delete({ email: _test_user.email }).then((deleted) => {
         expect(deleted.acknowledged).toBe(true);
         expect(deleted.deletedCount).toBe(1);
       });
     });
+
     it('⛔ throw error for user not found', async () => {
       await model.deleteMany({});
       await expect(
