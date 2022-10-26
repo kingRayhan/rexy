@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 import { TestScaffoldService } from '@/shared/test-scaffold/test-scaffold.service';
 import { TestScaffoldModule } from '@/shared/test-scaffold/test-scaffold.module';
+import { UserModule } from '@/api/user/user.module';
 
 describe('UserService', () => {
   let service: UserService;
@@ -13,7 +14,11 @@ describe('UserService', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [TestScaffoldModule, TypegooseModule.forFeature([User])],
+      imports: [
+        TestScaffoldModule,
+        UserModule,
+        TypegooseModule.forFeature([User]),
+      ],
       providers: [UserService],
     }).compile();
 

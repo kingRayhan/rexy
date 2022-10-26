@@ -1,32 +1,31 @@
-import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { getModelToken } from 'nestjs-typegoose';
-import { decode as JWTDecode } from 'jsonwebtoken';
-import configs from '../../app/config';
 import { AuthService } from './auth.service';
-import { FirebaseModule } from '@/shared/firebase/firebase.module';
 import { User } from '@/api/user/entities/user.entity';
-import { TestDatabaseModule } from '@/shared/test-database/test-database.module';
 import { UserModule } from '@/api/user/user.module';
-import { SessionModule } from '@/api/session/session.module';
 import { AuthRegisterDTO } from '@/api/auth/dto/register.dto';
 import { AppMessage } from '@/app/utils/messages.enum';
-import { SessionService } from '@/api/session/session.service';
 import { TestScaffoldModule } from '@/shared/test-scaffold/test-scaffold.module';
+import { TestScaffoldService } from '@/shared/test-scaffold/test-scaffold.service';
+import { SessionService } from '@/api/session/session.service';
+import { FirebaseService } from '@/shared/firebase/firebase.service';
+import { FirebaseModule } from '@/shared/firebase/firebase.module';
+import { SessionModule } from '@/api/session/session.module';
 
 describe('AuthService', () => {
   let service: AuthService;
   let userModel: ReturnModelType<typeof User>;
-  let sessionService: SessionService;
+  let testScaffoldService: TestScaffoldService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [TestScaffoldModule],
+      imports: [TestScaffoldModule, UserModule, FirebaseModule, SessionModule],
       providers: [AuthService],
     }).compile();
     service = module.get<AuthService>(AuthService);
     userModel = module.get<ReturnModelType<typeof User>>(getModelToken('User'));
+    testScaffoldService = module.get<TestScaffoldService>(TestScaffoldService);
   });
 
   beforeEach(async () => {
@@ -106,44 +105,30 @@ describe('AuthService', () => {
   });
 
   describe('authService.login', () => {
-    it('authService.login -> Get access and refresh token using username and password', async () => {
-      await userModel.deleteMany({});
-      const payload: AuthRegisterDTO = {
-        email: 'john@gmail.com',
-        password: '123456',
-        name: 'John Doe',
-        username: 'johndoe',
-      };
-      await userModel.create(payload);
+    it('authService.verifyCredential -> Get user for valid credential', async () => {
+      const _user = await testScaffoldService.createTestUser();
 
       service
         .verifyCredential({
-          user: payload.username,
-          password: '123456',
+          user: _user.username,
+          password: 'password',
         })
         .then((res) => {
           expect(res).toBeDefined();
-          expect(res.name).toBe(payload.name);
-          expect(res.email).toBe(payload.email);
-          expect(res.username).toBe(payload.username);
+          expect(res.name).toBe(_user.name);
+          expect(res.email).toBe(_user.email);
+          expect(res.username).toBe(_user.username);
         });
       await userModel.deleteMany({});
     });
 
-    it('authService.login -> get 403 for invalid username', async () => {
-      await userModel.deleteMany({});
-      const payload: AuthRegisterDTO = {
-        email: 'john@gmail.com',
-        password: '123456',
-        name: 'John Doe',
-        username: 'johndoe',
-      };
-      await userModel.create(payload);
+    it('authService.verifyCredential -> get 403 for invalid username', async () => {
+      const _user = await testScaffoldService.createTestUser();
 
       service
         .verifyCredential({
           user: 'wrong-username',
-          password: payload.password,
+          password: 'password',
         })
         .catch((err) => {
           expect(err.status).toBe(403);
@@ -153,17 +138,10 @@ describe('AuthService', () => {
     });
 
     it('authService.verifyCredential -> get 403 for invalid password', async () => {
-      await userModel.deleteMany({});
-      const payload: AuthRegisterDTO = {
-        email: 'john@gmail.com',
-        password: '123456',
-        name: 'John Doe',
-        username: 'johndoe',
-      };
-      await userModel.create(payload);
+      const _user = await testScaffoldService.createTestUser();
       service
         .verifyCredential({
-          user: payload.username,
+          user: _user.username,
           password: 'wrong---password',
         })
         .catch((err) => {
@@ -176,29 +154,10 @@ describe('AuthService', () => {
 
   describe('authService.logout', () => {
     it('authService.logout -> Logout using session id', async () => {
-      await userModel.deleteMany({});
-      const payload: AuthRegisterDTO = {
-        email: 'john@gmail.com',
-        password: '123456',
-        name: 'John Doe',
-        username: 'johndoe',
-      };
-      await userModel.create(payload);
-
-      service
-        .verifyCredential({
-          user: payload.username,
-          password: payload.password,
-        })
-        .then(async ({ _id }) => {
-          const token = await sessionService.claimToken(_id);
-          const decoded = JWTDecode(token.accessToken);
-          service.logout(decoded['session_id']).then((res) => {
-            expect(res).toBeDefined();
-            expect(res.deletedCount).toBe(1);
-            expect(res.acknowledged).toBe(true);
-          });
-        });
+      const { token } = await testScaffoldService.createTestUserAndToken();
+      service.logout(token.session_id).then((res) => {
+        expect(res).toBeDefined();
+      });
     });
 
     it('authService.logout -> get deletedCount = 0 for wrong session_id', async () => {

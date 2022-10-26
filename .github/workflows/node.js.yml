@@ -38,12 +38,14 @@ jobs:
         with:
           mongodb-db: text-test
 
-#       - name: Test -> AuthController
-#         run: npm run test -- -t AuthController
-#         env:
-#           CI: true
-
-      - name: Test -> AuthService
+      # ------------------------------------------------------------------------------
+      # Run Integration Tests
+      # ------------------------------------------------------------------------------
+      - name: 🧪 AuthService
         run: npm run test -- -t AuthService
+        env:
+          CI: true
+      - name: 🧪 AuthController - Authentication related endpoints
+        run: npm run test -- -t AuthController
         env:
           CI: true

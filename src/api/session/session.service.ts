@@ -41,6 +41,8 @@ export class SessionService {
   /**
    * Generate access and refresh token
    * @param subscriber user_id
+   * @param rt_token
+   * @param session_id
    * @returns
    */
   public generateAccessAndRefreshTokens(
@@ -60,7 +62,7 @@ export class SessionService {
         expiresIn: this.config.get('auth.refresh_token_expiration'),
       },
     );
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, session_id };
   }
 
   /**

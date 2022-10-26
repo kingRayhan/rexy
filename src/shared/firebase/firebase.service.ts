@@ -13,7 +13,7 @@ export class FirebaseService {
           path.resolve(`${__dirname}/../../../keys/firebase-admin-key.json`),
         ),
       },
-      'rexy-admin',
+      'rexy-firebase-admin',
     );
   }
 
