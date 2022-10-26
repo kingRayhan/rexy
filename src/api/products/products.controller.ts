@@ -14,8 +14,8 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { ProductListQueryDto } from './dto/product-list-query.dto';
-import { Authenticated } from "@/api/auth/decorators/authenticated.decorator";
-import AppResponse from "@/app/utils/app-response.class";
+import { Authenticated } from '@/api/auth/decorators/authenticated.decorator';
+import AppResponse from '@/app/utils/app-response.class';
 
 @Controller('products')
 @ApiTags('Products')
@@ -28,7 +28,7 @@ export class ProductsController {
     try {
       await this.productsService.create(createProductDto);
       return new AppResponse({
-        statusCode: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.CREATED,
         message: 'Product created successfully',
       });
     } catch (error) {

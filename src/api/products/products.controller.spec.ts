@@ -17,7 +17,7 @@ const demoProducts: Product[] = [
     price: 100,
     availability: true,
     code: 'test-product-1',
-    discount_rate: 0,
+    discount_rate: 15,
     durability: 0,
     max_durability: 0,
     mileage: 0,
@@ -30,7 +30,7 @@ const demoProducts: Product[] = [
     price: 100,
     availability: true,
     code: 'test-product-2',
-    discount_rate: 0,
+    discount_rate: 15,
     durability: 0,
     max_durability: 0,
     mileage: 0,
@@ -43,7 +43,7 @@ const demoProducts: Product[] = [
     price: 100,
     availability: true,
     code: 'test-product-3',
-    discount_rate: 0,
+    discount_rate: 15,
     durability: 0,
     max_durability: 0,
     mileage: 0,
@@ -56,7 +56,7 @@ const demoProducts: Product[] = [
     price: 100,
     availability: true,
     code: 'test-product-4',
-    discount_rate: 0,
+    discount_rate: 15,
     durability: 0,
     max_durability: 0,
     mileage: 0,
@@ -69,7 +69,7 @@ const demoProducts: Product[] = [
     price: 100,
     availability: true,
     code: 'test-product-5',
-    discount_rate: 0,
+    discount_rate: 15,
     durability: 0,
     max_durability: 0,
     mileage: 0,
@@ -128,7 +128,16 @@ describe('ProductsController', () => {
   });
 
   describe('POST /products', () => {
-    it('Create a product with token', async () => {
+    it('Create a product with authentication', async () => {
+      const { token } = await testScaffoldService.createTestUserAndToken();
+      const response = await request(app.getHttpServer())
+        .post('/products')
+        .send(demoProducts[0])
+        .set('Authorization', `Bearer ${token.accessToken}`);
+      expect(response.status).toBe(HttpStatus.CREATED);
+    });
+
+    it('⛔ Throw 401: For unauthenticated user', async () => {
       const response = await request(app.getHttpServer())
         .post('/products')
         .set('Authorization', `Bearer --`);
@@ -136,14 +145,12 @@ describe('ProductsController', () => {
       expect(response.body).toHaveProperty('message');
     });
 
-    it('⛔ Throw 401: For unauthenticated request', async () => {
-      const user = await testScaffoldService.createTestUser();
-
-      // const response = await request(app.getHttpServer())
-      //   .post('/products')
-      //   .set('Authorization', `Bearer --`);
-      // expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
-      // expect(response.body).toHaveProperty('message');
+    it('⛔ Throw 422: For without any body property', async () => {
+      const { token } = await testScaffoldService.createTestUserAndToken();
+      const response = await request(app.getHttpServer())
+        .post('/products')
+        .set('Authorization', `Bearer ${token.accessToken}`);
+      expect(response.status).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
     });
   });
 });

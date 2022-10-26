@@ -35,4 +35,13 @@ export class TestScaffoldService {
   public async createTokenForTestUser(user: User) {
     return this.sessionService.claimToken(user._id);
   }
+
+  /**
+   * Create a user and return the user and the access token
+   */
+  public async createTestUserAndToken() {
+    const user = await this.createTestUser();
+    const token = await this.createTokenForTestUser(user);
+    return { user, token };
+  }
 }
