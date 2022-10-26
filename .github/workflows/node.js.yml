@@ -57,3 +57,8 @@ jobs:
         run: npm run test -- -t RoleService --verbose
         env:
           CI: true
+
+      - name: 🧪 SessionService
+        run: npm run test -- -t SessionService --verbose
+        env:
+          CI: true

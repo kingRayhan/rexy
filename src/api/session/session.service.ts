@@ -71,8 +71,7 @@ export class SessionService {
    * @returns
    */
   public async storeSessionToDatabase(subscriber: string, rt_token: string) {
-    const session = await this.model.create({ subscriber, rt_token });
-    return session;
+    return await this.model.create({ subscriber, rt_token });
   }
 
   /**
