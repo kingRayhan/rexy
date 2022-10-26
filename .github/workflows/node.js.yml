@@ -62,3 +62,8 @@ jobs:
         run: npm run test -- -t SessionService --verbose
         env:
           CI: true
+
+      - name: 🧪 UserService
+        run: npm run test -- -t UserService --verbose
+        env:
+          CI: true

@@ -17,11 +17,14 @@ import validationOptions from '@/app/utils/validation-options';
 import { AppMessage } from '@/app/utils/messages.enum';
 import configs from '@/app/config/index';
 import { FirebaseModule } from '@/shared/firebase/firebase.module';
+import { TestScaffoldService } from '@/shared/test-scaffold/test-scaffold.service';
+import { TestScaffoldModule } from '@/shared/test-scaffold/test-scaffold.module';
 
 describe('AuthController', () => {
   let app: INestApplication;
   let controller: AuthController;
   let userModel: ReturnModelType<typeof User>;
+  let testScaffoldService: TestScaffoldService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,6 +37,7 @@ describe('AuthController', () => {
         SessionModule,
         PassportModule,
         FirebaseModule,
+        TestScaffoldModule,
       ],
       controllers: [AuthController],
       providers: [
@@ -43,6 +47,7 @@ describe('AuthController', () => {
       ],
     }).compile();
     controller = module.get<AuthController>(AuthController);
+    testScaffoldService = module.get<TestScaffoldService>(TestScaffoldService);
     userModel = module.get<ReturnModelType<typeof User>>(getModelToken('User'));
 
     app = module.createNestApplication();
@@ -234,21 +239,13 @@ describe('AuthController', () => {
     });
 
     it('Logout using a valid access token', async () => {
-      await userModel.deleteMany({});
-      userModel.create({
-        name: 'King Rayhan',
-        username: 'rayhan',
-        email: 'example@example.com',
-        password: '123456',
-      });
+      const { token } = await testScaffoldService.createTestUserAndToken();
 
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          user: 'rayhan',
-          password: '123456',
-        });
-      expect(loginResponse.status).toBe(200);
+      const logoutResponse = await request(app.getHttpServer())
+        .post('/auth/logout')
+        .set('Authorization', `Bearer ${token.accessToken}`);
+
+      expect(logoutResponse.status).toBe(200);
     });
 
     it('⛔ throw 401 for invalid access token', async () => {
@@ -267,25 +264,11 @@ describe('AuthController', () => {
     });
 
     it('Refresh using valid refresh token', async () => {
-      await userModel.deleteMany({});
-      await userModel.create({
-        name: 'King Rayhan',
-        username: 'rayhan',
-        email: 'example@example.com',
-        password: '123456',
-      });
-
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          user: 'rayhan',
-          password: '123456',
-        });
-      const refreshToken = loginResponse.body.data.refreshToken;
+      const { token } = await testScaffoldService.createTestUserAndToken();
 
       const refreshResponse = await request(app.getHttpServer())
         .post('/auth/refresh')
-        .set('Authorization', `Bearer ${refreshToken}`);
+        .set('Authorization', `Bearer ${token.refreshToken}`);
 
       expect(refreshResponse.status).toBe(200);
       expect(refreshResponse.body).toHaveProperty('message');
@@ -300,20 +283,8 @@ describe('AuthController', () => {
     });
 
     it('⛔ throw 401: After refreshing using a refresh token then that token will not work again', async () => {
-      await userModel.deleteMany({});
-      await userModel.create({
-        name: 'King Rayhan',
-        username: 'rayhan',
-        email: 'example@example.com',
-        password: '123456',
-      });
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          user: 'rayhan',
-          password: '123456',
-        });
-      const prev___refreshToken = loginResponse.body.data.refreshToken;
+      const { token } = await testScaffoldService.createTestUserAndToken();
+      const prev___refreshToken = token.refreshToken;
 
       await request(app.getHttpServer())
         .post('/auth/refresh')
