@@ -3,9 +3,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { getModelToken, TypegooseModule } from 'nestjs-typegoose';
 import configs from '../../app/config';
-import { TestDatabaseModule } from './../../shared/test-database/test-database.module';
 import { Session } from './entities/session.entity';
 import { SessionService } from './session.service';
+import { TestDatabaseModule } from '@/shared/test-database/test-database.module';
 
 describe('SessionService', () => {
   let service: SessionService;
@@ -79,7 +79,9 @@ describe('SessionService', () => {
 
       service.getSession({ _id }).then((session) => {
         expect(session).toBeDefined();
-        expect(session.subscriber.toString()).toBe(subscriber);
+        expect(JSON.stringify(session.subscriber)).toBe(
+          JSON.stringify(subscriber),
+        );
       });
     });
 
@@ -92,7 +94,9 @@ describe('SessionService', () => {
 
       service.getSession({ subscriber }).then((session) => {
         expect(session).toBeDefined();
-        expect(session.subscriber.toString()).toBe(subscriber);
+        expect(JSON.stringify(session.subscriber)).toBe(
+          JSON.stringify(subscriber),
+        );
       });
     });
 
