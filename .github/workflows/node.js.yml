@@ -42,10 +42,10 @@ jobs:
       # Run Integration Tests
       # ------------------------------------------------------------------------------
       - name: 🧪 AuthService
-        run: npm run test -- -t AuthService
+        run: npm run test -- -t AuthService --verbose
         env:
           CI: true
       - name: 🧪 AuthController - Authentication related endpoints
-        run: npm run test -- -t AuthController
+        run: npm run test -- -t AuthController --verbose
         env:
           CI: true
