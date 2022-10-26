@@ -248,16 +248,7 @@ describe('AuthController', () => {
           user: 'rayhan',
           password: '123456',
         });
-
-      const accessToken = loginResponse.body.data.accessToken;
-
-      const logoutResponse = await request(app.getHttpServer())
-        .post('/auth/logout')
-        .set('Authorization', `Bearer ${accessToken}`);
-
-      expect(logoutResponse.status).toBe(200);
-      expect(logoutResponse.body).toHaveProperty('message');
-      expect(logoutResponse.body.message).toBe(AppMessage.LOGOUT_SUCCESS);
+      expect(loginResponse.status).toBe(200);
     });
 
     it('⛔ throw 401 for invalid access token', async () => {
