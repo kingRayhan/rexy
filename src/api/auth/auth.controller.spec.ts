@@ -9,14 +9,14 @@ import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { PassportJWTAccessTokenStrategy } from './passport-stategies/jwt-at';
 import { PassportJWTRefreshTokenStrategy } from './passport-stategies/jwt-rt';
-import { User } from "@/api/user/entities/user.entity";
-import { TestDatabaseModule } from "@/shared/test-database/test-database.module";
-import { UserModule } from "@/api/user/user.module";
-import { SessionModule } from "@/api/session/session.module";
-import validationOptions from "@/app/utils/validation-options";
-import { AppMessage } from "@/app/utils/messages.enum";
+import { User } from '@/api/user/entities/user.entity';
+import { TestDatabaseModule } from '@/shared/test-database/test-database.module';
+import { UserModule } from '@/api/user/user.module';
+import { SessionModule } from '@/api/session/session.module';
+import validationOptions from '@/app/utils/validation-options';
+import { AppMessage } from '@/app/utils/messages.enum';
 import configs from '@/app/config/index';
-import { FirebaseModule } from "@/shared/firebase/firebase.module";
+import { FirebaseModule } from '@/shared/firebase/firebase.module';
 
 describe('AuthController', () => {
   let app: INestApplication;
@@ -33,7 +33,7 @@ describe('AuthController', () => {
         UserModule,
         SessionModule,
         PassportModule,
-        FirebaseModule
+        FirebaseModule,
       ],
       controllers: [AuthController],
       providers: [
@@ -277,7 +277,7 @@ describe('AuthController', () => {
 
     it('Refresh using valid refresh token', async () => {
       await userModel.deleteMany({});
-      userModel.create({
+      await userModel.create({
         name: 'King Rayhan',
         username: 'rayhan',
         email: 'example@example.com',
