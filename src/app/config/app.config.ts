@@ -49,6 +49,17 @@ export default registerAs('app', () => ({
 
   /*
     |--------------------------------------------------------------------------
+    | Application Cache
+    |--------------------------------------------------------------------------
+    | This value determines if the application will use cache.
+    | Set this in your ".env" file.
+    | If not set, the default value is true.
+    |
+    */
+  cache: process.env.APP_CACHE || 'true',
+
+  /*
+    |--------------------------------------------------------------------------
     | Api Prefix
     |--------------------------------------------------------------------------
     | This value determines the prefix of the API.

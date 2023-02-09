@@ -29,6 +29,11 @@ export class User {
 
   @Prop({ required: false, default: false })
   emailConfirmed?: boolean;
+
+  public comparePassword(password: string): boolean {
+    console.log(password);
+    return;
+  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

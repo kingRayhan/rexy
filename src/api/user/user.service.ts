@@ -3,7 +3,7 @@ import { CreateUserDto } from '@/api/user/dto/create-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { User, UserDocument } from '@/api/user/entities/user.entity';
-import { hashSync } from 'bcryptjs';
+import { compareSync, hashSync } from 'bcryptjs';
 import { UpdateUserDto } from '@/api/user/dto/update-user.dto';
 
 @Injectable()
@@ -50,5 +50,24 @@ export class UserService {
    */
   async updateUser(filter: FilterQuery<UserDocument>, body: UpdateUserDto) {
     return this.userModel.updateOne(filter, body);
+  }
+
+  /**
+   * Delete a user
+   * @param filter
+   * @returns
+   */
+  async deleteUser(filter: FilterQuery<UserDocument>) {
+    return this.userModel.deleteOne(filter);
+  }
+
+  /**
+   * Compare password
+   * @param user User
+   * @param password
+   * @returns
+   */
+  comparePassword(user: UserDocument, password: string): boolean {
+    return compareSync(password, user.password);
   }
 }
