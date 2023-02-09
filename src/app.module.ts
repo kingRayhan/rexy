@@ -4,7 +4,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './api/user/user.module';
 import { AppController } from './app.controller';
-import { AppTestApisController } from './app.test-apis';
+import { RolesModule } from './api/roles/roles.module';
 import configs from './app/config';
 
 @Module({
@@ -17,19 +17,15 @@ import configs from './app/config';
       load: configs,
       envFilePath: ['.env.prod', '.env.dev', '.env'],
     }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (config: ConfigService) => ({
-        uri: config.get('database.url'),
-      }),
-    }),
+    MongooseModule.forRoot(process.env.DATABASE_URL),
     EventEmitterModule.forRoot(),
 
     // ---------------------------------------------------------
     // Application modules
     // ---------------------------------------------------------
     UserModule,
+
+    RolesModule,
     // RoleModule,
     // SessionModule,
     // MailModule,
@@ -39,6 +35,6 @@ import configs from './app/config';
     // FirebaseModule,
     //  ----
   ],
-  controllers: [AppTestApisController, AppController],
+  controllers: [AppController],
 })
 export class AppModule {}
