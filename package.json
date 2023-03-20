@@ -42,7 +42,7 @@
     "date-fns": "^2.29.3",
     "firebase-admin": "^11.2.0",
     "jsonwebtoken": "^9.0.0",
-    "juice": "^8.1.0",
+    "juice": "^9.0.0",
     "md5": "^2.3.0",
     "mongoose": "^6.6.7",
     "nestjs-typegoose": "^7.1.38",
