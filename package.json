@@ -68,7 +68,7 @@
     "@types/jsonwebtoken": "^9.0.1",
     "@types/md5": "^2.3.2",
     "@types/mongoose": "^5.11.97",
-    "@types/node": "^18.11.3",
+    "@types/node": "^20.1.0",
     "@types/nodemailer": "^6.4.6",
     "@types/passport-jwt": "^3.0.7",
     "@types/pug": "^2.0.6",
