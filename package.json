@@ -51,7 +51,7 @@
     "passport-jwt": "^4.0.0",
     "pug": "^3.0.2",
     "reflect-metadata": "^0.1.13",
-    "rimraf": "^4.1.2",
+    "rimraf": "^5.0.1",
     "rxjs": "^7.5.7",
     "swagger-ui-express": "^4.5.0",
     "tsconfig-paths-jest": "^0.0.1",
